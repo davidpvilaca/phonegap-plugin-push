@@ -9,6 +9,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -23,9 +24,11 @@ import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.WearableExtender;
 import android.support.v4.app.RemoteInput;
+import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
@@ -48,86 +51,176 @@ import java.util.List;
 import java.util.Map;
 import java.security.SecureRandom;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
+import android.location.Location;
+
 @SuppressLint("NewApi")
-public class FCMService extends FirebaseMessagingService implements PushConstants {
+public class FCMService extends FirebaseMessagingService implements PushConstants, GoogleApiClient.ConnectionCallbacks {
 
-  private static final String LOG_TAG = "Push_FCMService";
-  private static HashMap<Integer, ArrayList<String>> messageMap = new HashMap<Integer, ArrayList<String>>();
+    private static final String LOG_TAG = "Push_FCMService";
+    private static HashMap<Integer, ArrayList<String>> messageMap = new HashMap<Integer, ArrayList<String>>();
 
-  public void setNotification(int notId, String message) {
-    ArrayList<String> messageList = messageMap.get(notId);
-    if (messageList == null) {
-      messageList = new ArrayList<String>();
-      messageMap.put(notId, messageList);
+    public void setNotification(int notId, String message) {
+        ArrayList<String> messageList = messageMap.get(notId);
+        if (messageList == null) {
+            messageList = new ArrayList<String>();
+            messageMap.put(notId, messageList);
+        }
+
+        if (message.isEmpty()) {
+            messageList.clear();
+        } else {
+            messageList.add(message);
+        }
     }
 
-    if (message.isEmpty()) {
-      messageList.clear();
-    } else {
-      messageList.add(message);
-    }
-  }
+    GoogleApiClient mGoogleApiClient = null;
+    Location mLastLocation = null;
+    Bundle mExtras = null;
 
-  @Override
-  public void onMessageReceived(RemoteMessage message) {
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation( mGoogleApiClient );
+        mGoogleApiClient.disconnect();
 
-    String from = message.getFrom();
-    Log.d(LOG_TAG, "onMessage - from: " + from);
-
-    Bundle extras = new Bundle();
-
-    if (message.getNotification() != null) {
-      extras.putString(TITLE, message.getNotification().getTitle());
-      extras.putString(MESSAGE, message.getNotification().getBody());
-      extras.putString(SOUND, message.getNotification().getSound());
-      extras.putString(ICON, message.getNotification().getIcon());
-      extras.putString(COLOR, message.getNotification().getColor());
-    }
-    for (Map.Entry<String, String> entry : message.getData().entrySet()) {
-      extras.putString(entry.getKey(), entry.getValue());
+        AppLocation mAppLocation = getLocationObjectFromString( mExtras.getString(LOCATION_OBJECT) );
+        if (ContainsLocation(mLastLocation, mAppLocation)) {
+            processNotification(mExtras);
+        }
     }
 
-    if (extras != null && isAvailableSender(from)) {
-      Context applicationContext = getApplicationContext();
+    private AppLocation getLocationObjectFromString( String json ) {
+        try {
+            JSONObject jsonLocation = new JSONObject( json ) ;
+            AppLocation appLocation = new AppLocation();
 
-      SharedPreferences prefs = applicationContext.getSharedPreferences(PushPlugin.COM_ADOBE_PHONEGAP_PUSH,
-          Context.MODE_PRIVATE);
-      boolean forceShow = prefs.getBoolean(FORCE_SHOW, false);
-      boolean clearBadge = prefs.getBoolean(CLEAR_BADGE, false);
-      String messageKey = prefs.getString(MESSAGE_KEY, MESSAGE);
-      String titleKey = prefs.getString(TITLE_KEY, TITLE);
+            appLocation.type = jsonLocation.getString( LOCATION_TYPE );
+            if (appLocation.type.equals( LOCATION_CIRCLE )) {
+                appLocation.radius = jsonLocation.getDouble( LOCATION_RADIUS );
+                appLocation.center = new LatLng( jsonLocation.getJSONObject( LOCATION_CENTER ).getDouble(LOCATION_LATITUDE), jsonLocation.getJSONObject(LOCATION_CENTER).getDouble(LOCATION_LONGITUDE) );
+            } else if ( appLocation.type.equals(LOCATION_POLYGON)) {
+                JSONArray polygon = jsonLocation.getJSONArray(LOCATION_POLYGON);
+                appLocation.polygon = new ArrayList<LatLng>();
+                for (int i=0; i < polygon.length(); i++) {
+                    JSONObject coord = polygon.getJSONObject( i );
+                    appLocation.polygon.add( new LatLng( coord.getDouble(LOCATION_LATITUDE), coord.getDouble(LOCATION_LONGITUDE) ) );
+                }
+            } else {
+                return null;
+            }
 
-      extras = normalizeExtras(applicationContext, extras, messageKey, titleKey);
-
-      if (clearBadge) {
-        PushPlugin.setApplicationIconBadgeNumber(getApplicationContext(), 0);
-      }
-
-      // if we are in the foreground and forceShow is `false` only send data
-      if (!forceShow && PushPlugin.isInForeground()) {
-        Log.d(LOG_TAG, "foreground");
-        extras.putBoolean(FOREGROUND, true);
-        extras.putBoolean(COLDSTART, false);
-        PushPlugin.sendExtras(extras);
-      }
-      // if we are in the foreground and forceShow is `true`, force show the notification if the data has at least a message or title
-      else if (forceShow && PushPlugin.isInForeground()) {
-        Log.d(LOG_TAG, "foreground force");
-        extras.putBoolean(FOREGROUND, true);
-        extras.putBoolean(COLDSTART, false);
-
-        showNotificationIfPossible(applicationContext, extras);
-      }
-      // if we are not in the foreground always send notification if the data has at least a message or title
-      else {
-        Log.d(LOG_TAG, "background");
-        extras.putBoolean(FOREGROUND, false);
-        extras.putBoolean(COLDSTART, PushPlugin.isActive());
-
-        showNotificationIfPossible(applicationContext, extras);
-      }
+            return appLocation;
+        } catch (JSONException ex) {
+            // Json incorreto
+            return null;
+        }
     }
-  }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    private boolean ContainsLocation(Location currentLocation, AppLocation appLocation) {
+        if ( appLocation == null || currentLocation == null )
+            return false;
+        
+        LatLng currentPoint = new LatLng( currentLocation.getLatitude(), currentLocation.getLongitude());
+        if ( appLocation.type.equals( LOCATION_POLYGON ) ) {
+            return PolyUtil.containsLocation( currentPoint, appLocation.polygon, true );
+        } else if ( appLocation.type.equals( LOCATION_CIRCLE ) ) {
+            return SphericalUtil.pointInCircle( currentPoint, appLocation.center, appLocation.radius );
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public void onMessageReceived(RemoteMessage message){
+
+        String from = message.getFrom();
+        Log.d(LOG_TAG, "onMessage - from: " + from);
+
+        Bundle extras = new Bundle();
+
+        if (message.getNotification() != null) {
+            extras.putString(TITLE, message.getNotification().getTitle());
+            extras.putString(MESSAGE, message.getNotification().getBody());
+            extras.putString(SOUND, message.getNotification().getSound());
+            extras.putString(ICON, message.getNotification().getIcon());
+            extras.putString(COLOR, message.getNotification().getColor());
+        }
+        for (Map.Entry<String, String> entry : message.getData().entrySet()) {
+            extras.putString(entry.getKey(), entry.getValue());
+        }
+
+        if (extras != null && isAvailableSender(from)) {
+            String locationAwareness = extras.getString(LOCATION_AWARENESS);
+
+            if ("1".equals(locationAwareness)){
+                if ( ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED ) {
+                    // Create an instance of GoogleAPIClient.
+                    if (mGoogleApiClient == null) {
+                        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                                .addConnectionCallbacks(this)
+                                .addApi(LocationServices.API)
+                                .build();
+                    }
+
+                    mExtras = extras;
+
+                    mGoogleApiClient.connect();
+                }
+            } else {
+                processNotification(extras);
+            }
+        }
+    }
+
+    private void processNotification( Bundle extras ) {
+        if (extras != null && isAvailableSender(from)) {
+            Context applicationContext = getApplicationContext();
+
+            SharedPreferences prefs = applicationContext.getSharedPreferences(PushPlugin.COM_ADOBE_PHONEGAP_PUSH,
+                Context.MODE_PRIVATE);
+            boolean forceShow = prefs.getBoolean(FORCE_SHOW, false);
+            boolean clearBadge = prefs.getBoolean(CLEAR_BADGE, false);
+            String messageKey = prefs.getString(MESSAGE_KEY, MESSAGE);
+            String titleKey = prefs.getString(TITLE_KEY, TITLE);
+
+            extras = normalizeExtras(applicationContext, extras, messageKey, titleKey);
+
+            if (clearBadge) {
+                PushPlugin.setApplicationIconBadgeNumber(getApplicationContext(), 0);
+            }
+
+            // if we are in the foreground and forceShow is `false` only send data
+            if (!forceShow && PushPlugin.isInForeground()) {
+                Log.d(LOG_TAG, "foreground");
+                extras.putBoolean(FOREGROUND, true);
+                extras.putBoolean(COLDSTART, false);
+                PushPlugin.sendExtras(extras);
+            }
+            // if we are in the foreground and forceShow is `true`, force show the notification if the data has at least a message or title
+            else if (forceShow && PushPlugin.isInForeground()) {
+                Log.d(LOG_TAG, "foreground force");
+                extras.putBoolean(FOREGROUND, true);
+                extras.putBoolean(COLDSTART, false);
+
+                showNotificationIfPossible(applicationContext, extras);
+            }
+            // if we are not in the foreground always send notification if the data has at least a message or title
+            else {
+                Log.d(LOG_TAG, "background");
+                extras.putBoolean(FOREGROUND, false);
+                extras.putBoolean(COLDSTART, PushPlugin.isActive());
+
+                showNotificationIfPossible(applicationContext, extras);
+            }
+        }
+    }
 
   /*
    * Change a values key in the extras bundle
