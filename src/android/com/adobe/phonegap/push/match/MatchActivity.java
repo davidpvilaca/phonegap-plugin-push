@@ -2,10 +2,10 @@ package com.adobe.phonegap.push.match;
 
 import android.app.Activity;
 import android.app.AlarmManager;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -17,11 +17,16 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.adobe.phonegap.push.PushConstants;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by alvaro.menezes on 05/12/2017.
  */
 
-public class MatchActivity extends Activity {
+public class MatchActivity extends Activity implements PushConstants {
   private CountDownTimer countDownTimer;
 
   @Override
@@ -32,35 +37,48 @@ public class MatchActivity extends Activity {
       WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
       WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
       WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
     getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-    NotificationManager mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-
-    mNotificationManager.cancel(1234);
+//    NotificationManager mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+//
+//    mNotificationManager.cancel(1234);
 
     setContentView(Meta.getResId(this, "layout", "activity_match"));
 
-    RecyclerView recyclerView = (RecyclerView) findViewById(Meta.getResId(this, "id", "adicionais"));
-    recyclerView.setHasFixedSize(true);
-
-    RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-//    RecyclerView.LayoutManager layoutManager = new GridLayoutManager(this, 1);;
-    recyclerView.setLayoutManager(layoutManager);
-
-    recyclerView.setAdapter(new AdicionaisAdapter(this));
-
     Typeface font = Typeface.createFromAsset(getAssets(), "fonts/icomoon.ttf");
-    TextView icon_categoria = (TextView) findViewById(Meta.getResId(this, "id", "icon_categoria"));
-    icon_categoria.setTypeface(font);
+    setIconFont("icon_category", font);
+    setIconFont("icon_freight_type", font);
+    setIconFont("icon_route", font);
 
-    TextView icon_tipoFrete = (TextView) findViewById(Meta.getResId(this, "id", "icon_tipoFrete"));
-    icon_tipoFrete.setTypeface(font);
+    Bundle extras = getIntent().getBundleExtra(MATCH_NOTIFICATION_EXTRAS);
+    setActivityValues(extras.getString(MATCH_ORDER_DETAILS));
 
-    TextView icon_rota = (TextView) findViewById(Meta.getResId(this, "id", "icon_rota"));
-    icon_rota.setTypeface(font);
+    startCountdown();
 
-    final ProgressBar progressBar = (ProgressBar) findViewById(Meta.getResId(this, "id", "progressBar"));
+    Button buttonAceitar = findViewById(Meta.getResId(this, "id", "button_accept"));
+    Button buttonRejeitar = findViewById(Meta.getResId(this, "id", "button_reject"));
+    buttonAceitar.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        countDownTimer.cancel();
+        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(COM_ADOBE_PHONEGAP_PUSH, Context.MODE_PRIVATE);
+        String userToken = sharedPref.getString(USER_TOKEN, "");
+
+      }
+    });
+    buttonRejeitar.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        countDownTimer.cancel();
+        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(COM_ADOBE_PHONEGAP_PUSH, Context.MODE_PRIVATE);
+        String userToken = sharedPref.getString(USER_TOKEN, "");
+        
+      }
+    });
+  }
+
+  private void startCountdown() {
+    final ProgressBar progressBar = findViewById(Meta.getResId(this, "id", "progressBar"));
 
     countDownTimer = new CountDownTimer(30200, 50) {
       @Override
@@ -75,24 +93,52 @@ public class MatchActivity extends Activity {
       }
     };
     countDownTimer.start();
+  }
 
-    Button buttonAceitar = (Button) findViewById(Meta.getResId(this, "id", "button_aceitar"));
-    Button buttonRejeitar = (Button) findViewById(Meta.getResId(this, "id", "button_rejeitar"));
+  private void setIconFont(String id, Typeface font) {
+    TextView view = findViewById(Meta.getResId(this, "id", id));
+    view.setTypeface(font);
+  }
 
-    buttonAceitar.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        countDownTimer.cancel();
-      }
-    });
+  private void setActivityValues(String json) {
+    try {
+      JSONObject jsonOrder = new JSONObject( json ) ;
 
-    buttonRejeitar.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        countDownTimer.cancel();
-      }
-    });
+      setItemValue("icon_category", IconMap.icons.get(jsonOrder.getString("categoryIcon")));
+      setItemValue("icon_freight_type", IconMap.icons.get(jsonOrder.getString("freightTypeIcon")));
+      setItemValue("icon_route", IconMap.icons.get(jsonOrder.getString("routeIcon")));
+      setItemValue("category", jsonOrder.getString("category"));
+      setItemValue("freight_type", jsonOrder.getString("freightType"));
+      setItemValue("route", jsonOrder.getString("route"));
+      setItemValue("eta", jsonOrder.getString("eta"));
+      setItemValue("address", jsonOrder.getString("address"));
 
+      RecyclerView recyclerView = findViewById(Meta.getResId(this, "id", "additional_services"));
+//    recyclerView.setHasFixedSize(true);
+      RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+      recyclerView.setLayoutManager(layoutManager);
+      recyclerView.setAdapter(new AdditionalsAdapter(jsonOrder.getJSONArray("additionals"), this));
+
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private void setItemValue(String id, String value) {
+    TextView view = findViewById(Meta.getResId(this, "id", id));
+    view.setText(value);
+  }
+
+  public static void startAlarm(Context context, Bundle extras) {
+    Intent intent = new Intent(context, MatchActivity.class);
+    intent.putExtra(MATCH_NOTIFICATION_EXTRAS, extras);
+    PendingIntent alarmIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+    AlarmManager alarms = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+    alarms.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), alarmIntent);
+  }
+
+  private void playSound(){
 //    MediaPlayer mp = MediaPlayer.create(this, R.raw.)
 
 //    gridview.setOnItemClickListener(new OnItemClickListener() {
@@ -102,15 +148,6 @@ public class MatchActivity extends Activity {
 //          Toast.LENGTH_SHORT).show();
 //      }
 //    });
-  }
-
-  public static void startAlarm(Context context) {
-    Intent activate = new Intent(context, MatchActivity.class);
-    activate.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-    AlarmManager alarms = (AlarmManager) context.getSystemService(ALARM_SERVICE);
-    PendingIntent alarmIntent = PendingIntent.getActivity(context, 0, activate, 0);
-    alarms.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), alarmIntent);
   }
 
 //  private void JsonRequest(){

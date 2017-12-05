@@ -36,7 +36,6 @@ import android.util.Log;
 import com.adobe.phonegap.push.location.AppLocation;
 import com.adobe.phonegap.push.location.PolyUtil;
 import com.adobe.phonegap.push.location.SphericalUtil;
-import com.adobe.phonegap.push.match.AdicionaisAdapter;
 import com.adobe.phonegap.push.match.MatchActivity;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -207,7 +206,7 @@ public class FCMService extends FirebaseMessagingService implements PushConstant
 
             // if we are in a match notification, show match alarm activity
             if ("1".equals(isMatch)) {
-                MatchActivity.startAlarm(this);
+                MatchActivity.startAlarm(this, extras);
             }
             // if we are in the foreground and forceShow is `false` only send data
             else if (!forceShow && PushPlugin.isInForeground()) {

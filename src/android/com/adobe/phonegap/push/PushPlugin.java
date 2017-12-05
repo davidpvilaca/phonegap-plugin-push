@@ -223,15 +223,16 @@ public class PushPlugin extends CordovaPlugin implements PushConstants {
               setApplicationIconBadgeNumber(getApplicationContext(), 0);
             }
 
-            editor.putBoolean(SOUND, jo.optBoolean(SOUND, true));
-            editor.putBoolean(VIBRATE, jo.optBoolean(VIBRATE, true));
-            editor.putBoolean(CLEAR_BADGE, clearBadge);
-            editor.putBoolean(CLEAR_NOTIFICATIONS, jo.optBoolean(CLEAR_NOTIFICATIONS, true));
-            editor.putBoolean(FORCE_SHOW, jo.optBoolean(FORCE_SHOW, false));
-            editor.putString(SENDER_ID, senderID);
-            editor.putString(MESSAGE_KEY, jo.optString(MESSAGE_KEY));
-            editor.putString(TITLE_KEY, jo.optString(TITLE_KEY));
-            editor.commit();
+                        editor.putBoolean(SOUND, jo.optBoolean(SOUND, true));
+                        editor.putBoolean(VIBRATE, jo.optBoolean(VIBRATE, true));
+                        editor.putBoolean(CLEAR_BADGE, clearBadge);
+                        editor.putBoolean(CLEAR_NOTIFICATIONS, jo.optBoolean(CLEAR_NOTIFICATIONS, true));
+                        editor.putBoolean(FORCE_SHOW, jo.optBoolean(FORCE_SHOW, false));
+                        editor.putString(SENDER_ID, senderID);
+                        editor.putString(MESSAGE_KEY, jo.optString(MESSAGE_KEY));
+                        editor.putString(TITLE_KEY, jo.optString(TITLE_KEY));
+                        editor.putString(USER_TOKEN, jo.optString(USER_TOKEN));
+                        editor.commit();
 
           }
 
@@ -260,16 +261,17 @@ public class PushPlugin extends CordovaPlugin implements PushConstants {
               FirebaseInstanceId.getInstance().deleteInstanceId();
               Log.v(LOG_TAG, "UNREGISTER");
 
-              // Remove shared prefs
-              SharedPreferences.Editor editor = sharedPref.edit();
-              editor.remove(SOUND);
-              editor.remove(VIBRATE);
-              editor.remove(CLEAR_BADGE);
-              editor.remove(CLEAR_NOTIFICATIONS);
-              editor.remove(FORCE_SHOW);
-              editor.remove(SENDER_ID);
-              editor.commit();
-            }
+                            // Remove shared prefs
+                            SharedPreferences.Editor editor = sharedPref.edit();
+                            editor.remove(SOUND);
+                            editor.remove(VIBRATE);
+                            editor.remove(CLEAR_BADGE);
+                            editor.remove(CLEAR_NOTIFICATIONS);
+                            editor.remove(FORCE_SHOW);
+                            editor.remove(SENDER_ID);
+                            editor.remove(USER_TOKEN);
+                            editor.commit();
+                        }
 
             callbackContext.success();
           } catch (IOException e) {
