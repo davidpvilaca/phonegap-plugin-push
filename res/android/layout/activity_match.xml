@@ -4,7 +4,7 @@
   android:layout_width="match_parent"
   android:layout_height="wrap_content"
   android:layout_gravity="center_vertical"
-  tools:context="com.example.alvaromenezes.myapplication.FullscreenActivity">
+  tools:context="com.adobe.phonegap.push.match.MatchActivity">
 
   <ProgressBar
     android:id="@+id/progressBar"
@@ -45,38 +45,32 @@
       android:orientation="horizontal">
 
       <TextView
-        android:id="@+id/icon_categoria"
+        android:id="@+id/icon_category"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight=".3"
-        android:fontFamily="fonts/icomoon.ttf"
-        android:text="&#xe905;"
         android:textSize="40dp"
         android:textAlignment="center" />
 
       <TextView
-        android:id="@+id/icon_tipoFrete"
+        android:id="@+id/icon_freight_type"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight=".3"
-        android:fontFamily="fonts/icomoon.ttf"
-        android:text="&#xe91a;"
         android:textSize="40dp"
         android:textAlignment="center" />
 
       <TextView
-        android:id="@+id/icon_rota"
+        android:id="@+id/icon_route"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight=".3"
-        android:fontFamily="fonts/icomoon.ttf"
-        android:text="&#xe91b;"
         android:textSize="40dp"
         android:textAlignment="center" />
     </LinearLayout>
 
     <LinearLayout
-      android:id="@+id/detalhes"
+      android:id="@+id/details"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_below="@id/layout_img"
@@ -87,28 +81,25 @@
       android:orientation="horizontal">
 
       <TextView
-        android:id="@+id/categoria"
+        android:id="@+id/category"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight=".3"
-        android:text="@string/categoria"
         android:textAlignment="center" />
 
       <TextView
-        android:id="@+id/tipoFrete"
+        android:id="@+id/freight_type"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight=".3"
-        android:text="@string/tipoFrete"
         android:textAlignment="center" />
 
       <TextView
-        android:id="@+id/rota"
+        android:id="@+id/route"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_weight=".3"
-        android:text="@string/rota"
         android:textAlignment="center" />
     </LinearLayout>
 
@@ -116,18 +107,17 @@
       android:id="@+id/eta"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_below="@id/detalhes"
+      android:layout_below="@id/details"
       android:layout_centerHorizontal="true"
       android:layout_marginLeft="10dp"
       android:layout_marginRight="10dp"
       android:background="@drawable/layout_bg"
       android:padding="10dp"
-      android:text="5 min o 2 km"
       android:textAlignment="center"
       android:textStyle="bold" />
 
     <LinearLayout
-      android:id="@+id/origem"
+      android:id="@+id/layout_origin"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_below="@id/eta"
@@ -135,7 +125,7 @@
       android:orientation="horizontal">
 
       <TextView
-        android:id="@+id/origem_badge"
+        android:id="@+id/badge_origin"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -143,35 +133,34 @@
         android:background="@drawable/layout_bg"
         android:baselineAligned="false"
         android:padding="2dp"
-        android:text="Origem"
+        android:text="@string/origin"
         android:textAlignment="center"
         android:textStyle="bold" />
 
       <TextView
-        android:id="@+id/endereco"
+        android:id="@+id/address"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_gravity="start"
         android:layout_marginLeft="10dp"
         android:layout_weight=".8"
-        android:text="@string/endereco"
         android:textAlignment="textStart" />
 
     </LinearLayout>
 
     <TextView
-      android:id="@+id/titulo_servicos_adicionais"
+      android:id="@+id/additional_services_title"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_below="@id/origem"
+      android:layout_below="@id/layout_origin"
       android:layout_marginLeft="10dp"
       android:layout_marginRight="10dp"
-      android:text="Serviços adicionais"
+      android:text="@string/additional_services"
       android:textStyle="bold" />
 
     <LinearLayout
-      android:id="@+id/layout_botoes"
+      android:id="@+id/layout_buttons"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_alignParentBottom="true"
@@ -188,11 +177,11 @@
         android:background="@color/red">
 
         <Button
-          android:id="@+id/button_rejeitar"
+          android:id="@+id/button_reject"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:background="?android:attr/selectableItemBackground"
-          android:text="@string/button_rejeitar"
+          android:text="@string/button_reject"
           android:textColor="#FFFFFF" />
       </LinearLayout>
 
@@ -204,31 +193,26 @@
         android:background="@color/colorPrimary">
 
         <Button
-          android:id="@+id/button_aceitar"
+          android:id="@+id/button_accept"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:background="?android:attr/selectableItemBackground"
-          android:text="@string/button_aceitar"
+          android:text="@string/button_accept"
           android:textColor="#FFFFFF" />
       </LinearLayout>
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
-      android:id="@+id/adicionais"
+      android:id="@+id/additional_services"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:layout_below="@+id/titulo_servicos_adicionais"
-      android:layout_above="@id/layout_botoes"
+      android:layout_below="@+id/additional_services_title"
+      android:layout_above="@id/layout_buttons"
       android:layout_marginLeft="10dp"
       android:layout_marginBottom="10dp"
       android:layout_marginRight="10dp"
       android:scrollbars="vertical" />
-
-
-
   </RelativeLayout>
-
-
 
 </RelativeLayout>
 

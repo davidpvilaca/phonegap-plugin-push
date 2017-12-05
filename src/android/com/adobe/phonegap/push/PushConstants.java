@@ -84,6 +84,8 @@ public interface PushConstants {
     public static final String GCM_DEFAULT_SENDER_ID = "gcm_defaultSenderId";
     public static final String PUSH_DISMISSED = "push_dismissed";
     public static final String MATCH_NOTIFICATION = "isMatch";
+    public static final String MATCH_ORDER_DETAILS = "order";
+    public static final String MATCH_NOTIFICATION_EXTRAS = "NOTIFICATION_EXTRAS";
     public static final String LOCATION_AWARENESS = "locationAwareness";
     public static final String LOCATION_OBJECT = "locationObject";
     public static final String LOCATION_TYPE = "type";
@@ -93,4 +95,6 @@ public interface PushConstants {
     public static final String LOCATION_LONGITUDE = "lon";
     public static final String LOCATION_CENTER = "center";
     public static final String LOCATION_RADIUS = "radius";
+    public static final String USER_TOKEN = "userToken";
+
 }
