@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="title_activity_fullscreen">Aceitar Frete</string>
+
+    <string name="button_aceitar">Aceitar</string>
+    <string name="button_rejeitar">Rejeitar</string>
+    <string name="categoria">Caminhão Caçamba Aberta</string>
+    <string name="tipoFrete">Imediato</string>
+    <string name="rota">37 min (23km)</string>
+    <string name="endereco">Rua José Neves, 123, Jardim da Penha, Vitória - ES</string>
+</resources>
