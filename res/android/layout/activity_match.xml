@@ -1,0 +1,234 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:layout_gravity="center_vertical"
+  tools:context="com.example.alvaromenezes.myapplication.FullscreenActivity">
+
+  <ProgressBar
+    android:id="@+id/progressBar"
+    style="@style/MyProgressBar"
+    android:layout_width="match_parent"
+    android:layout_height="10dp"
+    android:layout_alignParentTop="true"
+    android:layout_marginBottom="0dp"
+    android:layout_marginLeft="15dp"
+
+    android:layout_marginRight="15dp"
+    android:max="30000"
+    android:progress="30000"
+    android:progressBackgroundTint="@color/colorPrimary"
+    android:progressTint="@color/colorAccent" />
+
+  <RelativeLayout
+    android:id="@+id/fullscreen_content_controls"
+    style="?metaButtonBarStyle"
+    android:layout_width="match_parent"
+    android:layout_height="400dp"
+    android:layout_below="@id/progressBar"
+    android:layout_marginLeft="15dp"
+    android:layout_marginRight="15dp"
+    android:background="#FFF"
+    android:orientation="horizontal"
+    tools:ignore="UselessParent">
+
+    <LinearLayout
+      android:id="@+id/layout_img"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_alignParentTop="true"
+      android:layout_centerHorizontal="true"
+      android:layout_marginLeft="10dp"
+      android:layout_marginRight="10dp"
+      android:layout_marginTop="10dp"
+      android:orientation="horizontal">
+
+      <TextView
+        android:id="@+id/icon_categoria"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight=".3"
+        android:fontFamily="fonts/icomoon.ttf"
+        android:text="&#xe905;"
+        android:textSize="40dp"
+        android:textAlignment="center" />
+
+      <TextView
+        android:id="@+id/icon_tipoFrete"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight=".3"
+        android:fontFamily="fonts/icomoon.ttf"
+        android:text="&#xe91a;"
+        android:textSize="40dp"
+        android:textAlignment="center" />
+
+      <TextView
+        android:id="@+id/icon_rota"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight=".3"
+        android:fontFamily="fonts/icomoon.ttf"
+        android:text="&#xe91b;"
+        android:textSize="40dp"
+        android:textAlignment="center" />
+    </LinearLayout>
+
+    <LinearLayout
+      android:id="@+id/detalhes"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/layout_img"
+      android:layout_centerHorizontal="true"
+      android:layout_marginBottom="10dp"
+      android:layout_marginLeft="10dp"
+      android:layout_marginRight="10dp"
+      android:orientation="horizontal">
+
+      <TextView
+        android:id="@+id/categoria"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight=".3"
+        android:text="@string/categoria"
+        android:textAlignment="center" />
+
+      <TextView
+        android:id="@+id/tipoFrete"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight=".3"
+        android:text="@string/tipoFrete"
+        android:textAlignment="center" />
+
+      <TextView
+        android:id="@+id/rota"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_weight=".3"
+        android:text="@string/rota"
+        android:textAlignment="center" />
+    </LinearLayout>
+
+    <TextView
+      android:id="@+id/eta"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/detalhes"
+      android:layout_centerHorizontal="true"
+      android:layout_marginLeft="10dp"
+      android:layout_marginRight="10dp"
+      android:background="@drawable/layout_bg"
+      android:padding="10dp"
+      android:text="5 min o 2 km"
+      android:textAlignment="center"
+      android:textStyle="bold" />
+
+    <LinearLayout
+      android:id="@+id/origem"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/eta"
+      android:layout_margin="10dp"
+      android:orientation="horizontal">
+
+      <TextView
+        android:id="@+id/origem_badge"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight=".2"
+        android:background="@drawable/layout_bg"
+        android:baselineAligned="false"
+        android:padding="2dp"
+        android:text="Origem"
+        android:textAlignment="center"
+        android:textStyle="bold" />
+
+      <TextView
+        android:id="@+id/endereco"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="start"
+        android:layout_marginLeft="10dp"
+        android:layout_weight=".8"
+        android:text="@string/endereco"
+        android:textAlignment="textStart" />
+
+    </LinearLayout>
+
+    <TextView
+      android:id="@+id/titulo_servicos_adicionais"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/origem"
+      android:layout_marginLeft="10dp"
+      android:layout_marginRight="10dp"
+      android:text="Serviços adicionais"
+      android:textStyle="bold" />
+
+    <LinearLayout
+      android:id="@+id/layout_botoes"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_alignParentBottom="true"
+      android:layout_centerHorizontal="true"
+      android:layout_margin="0dp"
+      android:orientation="horizontal"
+      android:padding="0dp">
+
+      <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="0dp"
+        android:layout_weight=".5"
+        android:background="@color/red">
+
+        <Button
+          android:id="@+id/button_rejeitar"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="?android:attr/selectableItemBackground"
+          android:text="@string/button_rejeitar"
+          android:textColor="#FFFFFF" />
+      </LinearLayout>
+
+      <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="0dp"
+        android:layout_weight=".5"
+        android:background="@color/colorPrimary">
+
+        <Button
+          android:id="@+id/button_aceitar"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="?android:attr/selectableItemBackground"
+          android:text="@string/button_aceitar"
+          android:textColor="#FFFFFF" />
+      </LinearLayout>
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+      android:id="@+id/adicionais"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_below="@+id/titulo_servicos_adicionais"
+      android:layout_above="@id/layout_botoes"
+      android:layout_marginLeft="10dp"
+      android:layout_marginBottom="10dp"
+      android:layout_marginRight="10dp"
+      android:scrollbars="vertical" />
+
+
+
+  </RelativeLayout>
+
+
+
+</RelativeLayout>
+

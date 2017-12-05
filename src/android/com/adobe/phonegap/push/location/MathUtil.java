@@ -16,7 +16,7 @@
  * Copied from https://github.com/googlemaps/android-maps-utils/blob/master/library/src/com/google/maps/android/MathUtil.java
  */
 
-package com.adobe.phonegap.push;
+package com.adobe.phonegap.push.location;
 
 import static java.lang.Math.*;
 

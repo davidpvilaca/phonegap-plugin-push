@@ -83,6 +83,7 @@ public interface PushConstants {
     public static final String GOOGLE_APP_ID = "google_app_id";
     public static final String GCM_DEFAULT_SENDER_ID = "gcm_defaultSenderId";
     public static final String PUSH_DISMISSED = "push_dismissed";
+    public static final String MATCH_NOTIFICATION = "isMatch";
     public static final String LOCATION_AWARENESS = "locationAwareness";
     public static final String LOCATION_OBJECT = "locationObject";
     public static final String LOCATION_TYPE = "type";

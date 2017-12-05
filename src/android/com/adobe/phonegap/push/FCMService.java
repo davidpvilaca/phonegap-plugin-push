@@ -31,6 +31,11 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 
+import com.adobe.phonegap.push.location.AppLocation;
+import com.adobe.phonegap.push.location.PolyUtil;
+import com.adobe.phonegap.push.location.SphericalUtil;
+import com.adobe.phonegap.push.match.AdicionaisAdapter;
+import com.adobe.phonegap.push.match.MatchActivity;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -79,14 +84,16 @@ public class FCMService extends FirebaseMessagingService implements PushConstant
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        mLastLocation = LocationServices.FusedLocationApi.getLastLocation( mGoogleApiClient );
+        if ( ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED ) {
+          mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        }
         mGoogleApiClient.disconnect();
 
 
-            AppLocation mAppLocation = getLocationObjectFromString( mExtras.getString(LOCATION_OBJECT) );
-            if (ContainsLocation(mLastLocation, mAppLocation)) {
-                processNotification(mExtras);
-            }
+        AppLocation mAppLocation = getLocationObjectFromString( mExtras.getString(LOCATION_OBJECT) );
+        if (ContainsLocation(mLastLocation, mAppLocation)) {
+            processNotification(mExtras);
+        }
     }
 
     private AppLocation getLocationObjectFromString( String json ) {
@@ -124,7 +131,7 @@ public class FCMService extends FirebaseMessagingService implements PushConstant
     private boolean ContainsLocation(Location currentLocation, AppLocation appLocation) {
         if ( appLocation == null || currentLocation == null )
             return false;
-        
+
         LatLng currentPoint = new LatLng( currentLocation.getLatitude(), currentLocation.getLongitude());
         if ( appLocation.type.equals( LOCATION_POLYGON ) ) {
             return PolyUtil.containsLocation( currentPoint, appLocation.polygon, true );
@@ -183,6 +190,7 @@ public class FCMService extends FirebaseMessagingService implements PushConstant
             boolean clearBadge = prefs.getBoolean(CLEAR_BADGE, false);
             String messageKey = prefs.getString(MESSAGE_KEY, MESSAGE);
             String titleKey = prefs.getString(TITLE_KEY, TITLE);
+            String isMatch = extras.getString(MATCH_NOTIFICATION);
 
             extras = normalizeExtras(applicationContext, extras, messageKey, titleKey);
 
@@ -190,8 +198,12 @@ public class FCMService extends FirebaseMessagingService implements PushConstant
                 PushPlugin.setApplicationIconBadgeNumber(getApplicationContext(), 0);
             }
 
+            // if we are in a match notification, show match alarm activity
+            if ("1".equals(isMatch)) {
+                MatchActivity.startAlarm(this);
+            }
             // if we are in the foreground and forceShow is `false` only send data
-            if (!forceShow && PushPlugin.isInForeground()) {
+            else if (!forceShow && PushPlugin.isInForeground()) {
                 Log.d(LOG_TAG, "foreground");
                 extras.putBoolean(FOREGROUND, true);
                 extras.putBoolean(COLDSTART, false);
