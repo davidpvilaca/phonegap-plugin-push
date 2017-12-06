@@ -155,14 +155,16 @@ public class PushPlugin extends CordovaPlugin implements PushConstants {
           pushContext = callbackContext;
           JSONObject jo = null;
 
-          Log.v(LOG_TAG, "execute: data=" + data.toString());
-          SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(COM_ADOBE_PHONEGAP_PUSH,
-              Context.MODE_PRIVATE);
-          String token = null;
-          String senderID = null;
+                    Log.v(LOG_TAG, "execute: data=" + data.toString());
+                    SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(COM_ADOBE_PHONEGAP_PUSH,
+                        Context.MODE_PRIVATE);
+                    String token = null;
+                    String senderID = null;
+                    String userToken = null;
 
-          try {
-            jo = data.getJSONObject(0).getJSONObject(ANDROID);
+                    try {
+                        userToken = data.getJSONObject(0).getString(USER_TOKEN);
+                        jo = data.getJSONObject(0).getJSONObject(ANDROID);
 
             // If no NotificationChannels exist create the default one
             createDefaultNotificationChannelIfNeeded(jo);
@@ -231,7 +233,7 @@ public class PushPlugin extends CordovaPlugin implements PushConstants {
                         editor.putString(SENDER_ID, senderID);
                         editor.putString(MESSAGE_KEY, jo.optString(MESSAGE_KEY));
                         editor.putString(TITLE_KEY, jo.optString(TITLE_KEY));
-                        editor.putString(USER_TOKEN, jo.optString(USER_TOKEN));
+                        editor.putString(USER_TOKEN, userToken);
                         editor.commit();
 
           }

@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.Vibrator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
@@ -28,6 +29,7 @@ import org.json.JSONObject;
 
 public class MatchActivity extends Activity implements PushConstants {
   private CountDownTimer countDownTimer;
+  private static long DURATION = 30000;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -39,25 +41,21 @@ public class MatchActivity extends Activity implements PushConstants {
       WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-//    NotificationManager mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
-//
-//    mNotificationManager.cancel(1234);
-
     setContentView(Meta.getResId(this, "layout", "activity_match"));
-
-    Typeface font = Typeface.createFromAsset(getAssets(), "fonts/icomoon.ttf");
-    setIconFont("icon_category", font);
-    setIconFont("icon_freight_type", font);
-    setIconFont("icon_route", font);
 
     Bundle extras = getIntent().getBundleExtra(MATCH_NOTIFICATION_EXTRAS);
     setActivityValues(extras.getString(MATCH_ORDER_DETAILS));
 
+    AudioPlayer.play(this);
+
+    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+    v.vibrate(new long[]{100L, 100L}, 0);
+
     startCountdown();
 
-    Button buttonAceitar = findViewById(Meta.getResId(this, "id", "button_accept"));
-    Button buttonRejeitar = findViewById(Meta.getResId(this, "id", "button_reject"));
-    buttonAceitar.setOnClickListener(new View.OnClickListener() {
+    Button buttonAccept = findViewById(Meta.getResId(this, "id", "button_accept"));
+    Button buttonReject = findViewById(Meta.getResId(this, "id", "button_reject"));
+    buttonAccept.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
         countDownTimer.cancel();
@@ -66,21 +64,29 @@ public class MatchActivity extends Activity implements PushConstants {
 
       }
     });
-    buttonRejeitar.setOnClickListener(new View.OnClickListener() {
+    buttonReject.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
         countDownTimer.cancel();
         SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(COM_ADOBE_PHONEGAP_PUSH, Context.MODE_PRIVATE);
         String userToken = sharedPref.getString(USER_TOKEN, "");
-        
       }
     });
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    AudioPlayer.stop(this);
+    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+    v.cancel();
   }
 
   private void startCountdown() {
     final ProgressBar progressBar = findViewById(Meta.getResId(this, "id", "progressBar"));
 
-    countDownTimer = new CountDownTimer(30200, 50) {
+    int interval = 50;
+    countDownTimer = new CountDownTimer(DURATION + interval, interval) {
       @Override
       public void onTick(long millisUntilFinished) {
         progressBar.setProgress((int)millisUntilFinished);
@@ -102,6 +108,11 @@ public class MatchActivity extends Activity implements PushConstants {
 
   private void setActivityValues(String json) {
     try {
+      Typeface font = Typeface.createFromAsset(getAssets(), "fonts/icomoon.ttf");
+      setIconFont("icon_category", font);
+      setIconFont("icon_freight_type", font);
+      setIconFont("icon_route", font);
+
       JSONObject jsonOrder = new JSONObject( json ) ;
 
       setItemValue("icon_category", IconMap.icons.get(jsonOrder.getString("categoryIcon")));
@@ -114,7 +125,6 @@ public class MatchActivity extends Activity implements PushConstants {
       setItemValue("address", jsonOrder.getString("address"));
 
       RecyclerView recyclerView = findViewById(Meta.getResId(this, "id", "additional_services"));
-//    recyclerView.setHasFixedSize(true);
       RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
       recyclerView.setLayoutManager(layoutManager);
       recyclerView.setAdapter(new AdditionalsAdapter(jsonOrder.getJSONArray("additionals"), this));
@@ -136,18 +146,6 @@ public class MatchActivity extends Activity implements PushConstants {
 
     AlarmManager alarms = (AlarmManager) context.getSystemService(ALARM_SERVICE);
     alarms.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), alarmIntent);
-  }
-
-  private void playSound(){
-//    MediaPlayer mp = MediaPlayer.create(this, R.raw.)
-
-//    gridview.setOnItemClickListener(new OnItemClickListener() {
-//      public void onItemClick(AdapterView<?> parent, View v,
-//                              int position, long id) {
-//        Toast.makeText(HelloGridView.this, "" + position,
-//          Toast.LENGTH_SHORT).show();
-//      }
-//    });
   }
 
 //  private void JsonRequest(){
