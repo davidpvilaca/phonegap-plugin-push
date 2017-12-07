@@ -61,15 +61,20 @@
     <framework src="push.gradle" custom="true" type="gradleReference"/>
     <framework src="com.google.android.gms:play-services-location:11.0.1"/>
     <framework src="com.google.android.gms:play-services-maps:11.0.1"/>
-
+    <framework src="com.android.volley:volley:1.1.0"/>
+    
     <source-file src="src/android/com/adobe/phonegap/push/FCMService.java" target-dir="src/com/adobe/phonegap/push/"/>
     <source-file src="src/android/com/adobe/phonegap/push/location/AppLocation.java" target-dir="src/com/adobe/phonegap/push/location/"/>
     <source-file src="src/android/com/adobe/phonegap/push/location/MathUtil.java" target-dir="src/com/adobe/phonegap/push/location/"/>
     <source-file src="src/android/com/adobe/phonegap/push/location/PolyUtil.java" target-dir="src/com/adobe/phonegap/push/location/"/>
     <source-file src="src/android/com/adobe/phonegap/push/location/SphericalUtil.java" target-dir="src/com/adobe/phonegap/push/location/"/>
-    <source-file src="src/android/com/adobe/phonegap/push/match/AdicionaisAdapter.java" target-dir="src/com/adobe/phonegap/push/match/"/>
+    <source-file src="src/android/com/adobe/phonegap/push/match/AdditionalsAdapter.java" target-dir="src/com/adobe/phonegap/push/match/"/>
+    <source-file src="src/android/com/adobe/phonegap/push/match/AudioPlayer.java" target-dir="src/com/adobe/phonegap/push/match/"/>
+    <source-file src="src/android/com/adobe/phonegap/push/match/IconMap.java" target-dir="src/com/adobe/phonegap/push/match/"/>
     <source-file src="src/android/com/adobe/phonegap/push/match/MatchActivity.java" target-dir="src/com/adobe/phonegap/push/match/"/>
     <source-file src="src/android/com/adobe/phonegap/push/match/Meta.java" target-dir="src/com/adobe/phonegap/push/match/"/>
+    <source-file src="src/android/com/adobe/phonegap/push/match/OrderApiService.java" target-dir="src/com/adobe/phonegap/push/match/"/>
+    <source-file src="src/android/com/adobe/phonegap/push/match/RejectedOrders.java" target-dir="src/com/adobe/phonegap/push/match/"/>
     <source-file src="src/android/com/adobe/phonegap/push/PushConstants.java" target-dir="src/com/adobe/phonegap/push/"/>
     <source-file src="src/android/com/adobe/phonegap/push/PushHandlerActivity.java" target-dir="src/com/adobe/phonegap/push/"/>
     <source-file src="src/android/com/adobe/phonegap/push/PushInstanceIDListenerService.java" target-dir="src/com/adobe/phonegap/push/"/>
