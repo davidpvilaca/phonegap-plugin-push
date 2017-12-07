@@ -17,8 +17,11 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.adobe.phonegap.push.PushConstants;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,6 +33,7 @@ import org.json.JSONObject;
 public class MatchActivity extends Activity implements PushConstants {
   private CountDownTimer countDownTimer;
   private static long DURATION = 30000;
+  private RejectedOrders rejectedOrders;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -43,8 +47,21 @@ public class MatchActivity extends Activity implements PushConstants {
 
     setContentView(Meta.getResId(this, "layout", "activity_match"));
 
+    rejectedOrders = new RejectedOrders(this);
     Bundle extras = getIntent().getBundleExtra(MATCH_NOTIFICATION_EXTRAS);
-    setActivityValues(extras.getString(MATCH_ORDER_DETAILS));
+    try {
+      JSONObject jsonOrder = new JSONObject(extras.getString(MATCH_ORDER_DETAILS));
+      final int orderId = jsonOrder.getInt("id");
+
+      if (rejectedOrders.exists(orderId)) {
+        finish();
+      }
+
+      setButtonEvents(orderId);
+      setActivityValues(jsonOrder);
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
 
     AudioPlayer.play(this);
 
@@ -52,31 +69,83 @@ public class MatchActivity extends Activity implements PushConstants {
     v.vibrate(new long[]{100L, 100L}, 0);
 
     startCountdown();
+  }
+
+  private void setButtonEvents(final int orderId) throws JSONException {
+    SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(COM_ADOBE_PHONEGAP_PUSH, Context.MODE_PRIVATE);
+    final String userToken = sharedPref.getString(USER_TOKEN, "");
+    final OrderApiService orderApiService = new OrderApiService(this, orderId, userToken);
+    final Context ctx = this;
 
     Button buttonAccept = findViewById(Meta.getResId(this, "id", "button_accept"));
-    Button buttonReject = findViewById(Meta.getResId(this, "id", "button_reject"));
     buttonAccept.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        countDownTimer.cancel();
-        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(COM_ADOBE_PHONEGAP_PUSH, Context.MODE_PRIVATE);
-        String userToken = sharedPref.getString(USER_TOKEN, "");
-
+        accept(ctx, orderId, orderApiService);
       }
     });
+
+    Button buttonReject = findViewById(Meta.getResId(this, "id", "button_reject"));
     buttonReject.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        countDownTimer.cancel();
-        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(COM_ADOBE_PHONEGAP_PUSH, Context.MODE_PRIVATE);
-        String userToken = sharedPref.getString(USER_TOKEN, "");
+        reject(ctx, orderId, orderApiService);
       }
     });
+  }
+
+  private void accept(final Context ctx, final int orderId, OrderApiService orderApiService) {
+    stopAlerts();
+
+    orderApiService.accept(
+      new Response.Listener<JSONObject>() {
+        @Override
+        public void onResponse(JSONObject response) {
+          Toast.makeText(ctx, "Pedido " + orderId + " aceito", Toast.LENGTH_SHORT).show();
+          finish();
+        }
+      },
+      new Response.ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+          Toast.makeText(ctx, "Não foi possível aceitar o pedido " + orderId +
+            ". Favor tentar novamente", Toast.LENGTH_LONG).show();
+          error.printStackTrace();
+        }
+      }
+    );
+  }
+
+  private void reject(final Context ctx, final int orderId, OrderApiService orderApiService) {
+    stopAlerts();
+    rejectedOrders.add(orderId);
+
+    orderApiService.reject(
+      new Response.Listener<JSONObject>() {
+        @Override
+        public void onResponse(JSONObject response) {
+          Toast.makeText(ctx, "Pedido " + orderId + " rejeitado", Toast.LENGTH_SHORT).show();
+        }
+      },
+      new Response.ErrorListener() {
+        @Override
+        public void onErrorResponse(VolleyError error) {
+          error.printStackTrace();
+        }
+      }
+    );
+
+    finish();
   }
 
   @Override
   protected void onDestroy() {
     super.onDestroy();
+    stopAlerts();
+  }
+
+  private void stopAlerts() {
+    countDownTimer.cancel();
     AudioPlayer.stop(this);
     Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
     v.cancel();
@@ -89,7 +158,7 @@ public class MatchActivity extends Activity implements PushConstants {
     countDownTimer = new CountDownTimer(DURATION + interval, interval) {
       @Override
       public void onTick(long millisUntilFinished) {
-        progressBar.setProgress((int)millisUntilFinished);
+        progressBar.setProgress((int) millisUntilFinished);
       }
 
       @Override
@@ -106,32 +175,25 @@ public class MatchActivity extends Activity implements PushConstants {
     view.setTypeface(font);
   }
 
-  private void setActivityValues(String json) {
-    try {
-      Typeface font = Typeface.createFromAsset(getAssets(), "fonts/icomoon.ttf");
-      setIconFont("icon_category", font);
-      setIconFont("icon_freight_type", font);
-      setIconFont("icon_route", font);
+  private void setActivityValues(JSONObject jsonOrder) throws JSONException {
+    Typeface font = Typeface.createFromAsset(getAssets(), "fonts/icomoon.ttf");
+    setIconFont("icon_category", font);
+    setIconFont("icon_freight_type", font);
+    setIconFont("icon_route", font);
 
-      JSONObject jsonOrder = new JSONObject( json ) ;
+    setItemValue("icon_category", IconMap.icons.get(jsonOrder.getString("categoryIcon")));
+    setItemValue("icon_freight_type", IconMap.icons.get(jsonOrder.getString("freightTypeIcon")));
+    setItemValue("icon_route", IconMap.icons.get(jsonOrder.getString("routeIcon")));
+    setItemValue("category", jsonOrder.getString("category"));
+    setItemValue("freight_type", jsonOrder.getString("freightType"));
+    setItemValue("route", jsonOrder.getString("route"));
+    setItemValue("eta", jsonOrder.getString("eta"));
+    setItemValue("address", jsonOrder.getString("address"));
 
-      setItemValue("icon_category", IconMap.icons.get(jsonOrder.getString("categoryIcon")));
-      setItemValue("icon_freight_type", IconMap.icons.get(jsonOrder.getString("freightTypeIcon")));
-      setItemValue("icon_route", IconMap.icons.get(jsonOrder.getString("routeIcon")));
-      setItemValue("category", jsonOrder.getString("category"));
-      setItemValue("freight_type", jsonOrder.getString("freightType"));
-      setItemValue("route", jsonOrder.getString("route"));
-      setItemValue("eta", jsonOrder.getString("eta"));
-      setItemValue("address", jsonOrder.getString("address"));
-
-      RecyclerView recyclerView = findViewById(Meta.getResId(this, "id", "additional_services"));
-      RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-      recyclerView.setLayoutManager(layoutManager);
-      recyclerView.setAdapter(new AdditionalsAdapter(jsonOrder.getJSONArray("additionals"), this));
-
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
+    RecyclerView recyclerView = findViewById(Meta.getResId(this, "id", "additional_services"));
+    RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
+    recyclerView.setLayoutManager(layoutManager);
+    recyclerView.setAdapter(new AdditionalsAdapter(jsonOrder.getJSONArray("optionals"), this));
   }
 
   private void setItemValue(String id, String value) {
@@ -147,21 +209,4 @@ public class MatchActivity extends Activity implements PushConstants {
     AlarmManager alarms = (AlarmManager) context.getSystemService(ALARM_SERVICE);
     alarms.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), alarmIntent);
   }
-
-//  private void JsonRequest(){
-//    JsonObjectRequest jsObjRequest = new JsonObjectRequest
-//      (Request.Method.GET, "http://url-do-request", null, new Response.Listener<JSONObject>() {
-//
-//        @Override
-//        public void onResponse(JSONObject response) {
-//          // TODO Auto-generated method stub
-//        }
-//      }, new Response.ErrorListener() {
-//        @Override
-//        public void onErrorResponse(VolleyError error) {
-//          // TODO Auto-generated method stub
-//        }
-//      });
-//  }
 }
-
