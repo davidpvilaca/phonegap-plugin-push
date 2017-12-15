@@ -77,7 +77,7 @@ public class MatchActivity extends Activity implements PushConstants {
     final OrderApiService orderApiService = new OrderApiService(this, orderId, userToken);
     final Context ctx = this;
 
-    Button buttonAccept = findViewById(Meta.getResId(this, "id", "button_accept"));
+    Button buttonAccept = (Button)findViewById(Meta.getResId(this, "id", "button_accept"));
     buttonAccept.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
@@ -85,7 +85,7 @@ public class MatchActivity extends Activity implements PushConstants {
       }
     });
 
-    Button buttonReject = findViewById(Meta.getResId(this, "id", "button_reject"));
+    Button buttonReject = (Button)findViewById(Meta.getResId(this, "id", "button_reject"));
     buttonReject.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
@@ -152,7 +152,7 @@ public class MatchActivity extends Activity implements PushConstants {
   }
 
   private void startCountdown() {
-    final ProgressBar progressBar = findViewById(Meta.getResId(this, "id", "progressBar"));
+    final ProgressBar progressBar = (ProgressBar)findViewById(Meta.getResId(this, "id", "progressBar"));
 
     int interval = 50;
     countDownTimer = new CountDownTimer(DURATION + interval, interval) {
@@ -171,7 +171,7 @@ public class MatchActivity extends Activity implements PushConstants {
   }
 
   private void setIconFont(String id, Typeface font) {
-    TextView view = findViewById(Meta.getResId(this, "id", id));
+    TextView view = (TextView)findViewById(Meta.getResId(this, "id", id));
     view.setTypeface(font);
   }
 
@@ -190,14 +190,14 @@ public class MatchActivity extends Activity implements PushConstants {
     setItemValue("eta", jsonOrder.getString("eta"));
     setItemValue("address", jsonOrder.getString("address"));
 
-    RecyclerView recyclerView = findViewById(Meta.getResId(this, "id", "additional_services"));
+    RecyclerView recyclerView = (RecyclerView)findViewById(Meta.getResId(this, "id", "additional_services"));
     RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
     recyclerView.setLayoutManager(layoutManager);
     recyclerView.setAdapter(new AdditionalsAdapter(jsonOrder.getJSONArray("optionals"), this));
   }
 
   private void setItemValue(String id, String value) {
-    TextView view = findViewById(Meta.getResId(this, "id", id));
+    TextView view = (TextView)findViewById(Meta.getResId(this, "id", id));
     view.setText(value);
   }
 
