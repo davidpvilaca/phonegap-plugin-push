@@ -1,17 +1,28 @@
 package com.adobe.phonegap.push.match;
 
+import android.Manifest;
 import android.app.Activity;
-import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.location.Location;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -20,20 +31,32 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.adobe.phonegap.push.PushConstants;
+import com.adobe.phonegap.push.PushHandlerActivity;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Random;
+
+import static android.support.v4.app.NotificationCompat.PRIORITY_MAX;
 
 /**
  * Created by alvaro.menezes on 05/12/2017.
  */
 
 public class MatchActivity extends Activity implements PushConstants {
-  private CountDownTimer countDownTimer;
   private static long DURATION = 30000;
-  private RejectedOrders rejectedOrders;
+  private CountDownTimer mCountDownTimer;
+  private RejectedOrders mRejectedOrders = null;
+  private OrderApiService mOrderApiService = null;
+  private FusedLocationProviderClient mFusedLocationClient = null;
+  private ProgressDialog mProgressDialog = null;
+  private Bundle mExtras = null;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -47,41 +70,123 @@ public class MatchActivity extends Activity implements PushConstants {
 
     setContentView(Meta.getResId(this, "layout", "activity_match"));
 
-    rejectedOrders = new RejectedOrders(this);
-    Bundle extras = getIntent().getBundleExtra(MATCH_NOTIFICATION_EXTRAS);
+    mProgressDialog = new ProgressDialog(this);
+    mRejectedOrders = new RejectedOrders(this);
+    mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+    mExtras = getIntent().getBundleExtra(MATCH_NOTIFICATION_EXTRAS);
+
     try {
-      JSONObject jsonOrder = new JSONObject(extras.getString(MATCH_ORDER_DETAILS));
+      JSONObject jsonOrder = new JSONObject(mExtras.getString(MATCH_ORDER_DETAILS));
       final int orderId = jsonOrder.getInt("id");
 
-      if (rejectedOrders.exists(orderId)) {
+      if (mRejectedOrders.exists(orderId)) {
         finish();
       }
 
+      SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(COM_ADOBE_PHONEGAP_PUSH, Context.MODE_PRIVATE);
+      final String userToken = sharedPref.getString(USER_TOKEN, "");
+      mOrderApiService = new OrderApiService(this, orderId, userToken);
+
       setButtonEvents(orderId);
       setActivityValues(jsonOrder);
+      loadETA(orderId);
+
     } catch (JSONException e) {
       e.printStackTrace();
     }
 
-    AudioPlayer.play(this);
+    startAlerts();
+  }
 
-    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-    v.vibrate(new long[]{100L, 100L}, 0);
+  private void loadETA(final int orderId) {
+    final Context ctx = this;
 
-    startCountdown();
+    ProgressBar etaProgressBar = (ProgressBar) findViewById(Meta.getResId(this, "id", "eta_progressBar"));
+
+    int color = ResourcesCompat.getColor(getResources(),
+      Meta.getResId(this, "color", "colorPrimary"), null);
+    etaProgressBar.getIndeterminateDrawable().setColorFilter(color, PorterDuff.Mode.SRC_IN);
+
+    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+      ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+      mFusedLocationClient.getLastLocation()
+        .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+          @Override
+          public void onSuccess(Location location) {
+            // Got last known location. In some rare situations this can be null.
+            if (location != null) {
+              mOrderApiService.eta(location,
+                new Response.Listener<JSONObject>() {
+                  @Override
+                  public void onResponse(JSONObject response) {
+                    try {
+                      int distance = response.getInt("distance");
+                      int durationInTrafficMinutes = response.getInt("durationInTraffic") / 60;
+                      int durationInTrafficHours = 0;
+
+                      if ( durationInTrafficMinutes > 60 ) {
+                        durationInTrafficHours = durationInTrafficMinutes / 60;
+                        durationInTrafficMinutes = durationInTrafficMinutes % 60;
+                      }
+
+                      String textETA = "";
+                      if (durationInTrafficHours > 0){
+                        textETA += durationInTrafficHours + "h ";
+                      }
+
+                      textETA += durationInTrafficMinutes + "min - " + distance + "km";
+
+                      TextView etaView = (TextView) findViewById(Meta.getResId(ctx, "id", "eta"));
+                      etaView.setText(textETA);
+                      etaView.setVisibility(View.VISIBLE);
+
+                      TextView etaDetailsView = (TextView) findViewById(Meta.getResId(ctx, "id", "eta_details"));
+                      etaDetailsView.setVisibility(View.VISIBLE);
+
+                      ProgressBar etaProgressBar = (ProgressBar) findViewById(Meta.getResId(ctx, "id", "eta_progressBar"));
+                      etaProgressBar.setVisibility(View.INVISIBLE);
+                    } catch (JSONException e) {
+                      e.printStackTrace();
+                    }
+                  }
+                },
+                new Response.ErrorListener() {
+                  @Override
+                  public void onErrorResponse(VolleyError error) {
+                    error.printStackTrace();
+                  }
+                }
+              );
+            }
+          }
+        });
+    }
   }
 
   private void setButtonEvents(final int orderId) throws JSONException {
-    SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(COM_ADOBE_PHONEGAP_PUSH, Context.MODE_PRIVATE);
-    final String userToken = sharedPref.getString(USER_TOKEN, "");
-    final OrderApiService orderApiService = new OrderApiService(this, orderId, userToken);
     final Context ctx = this;
+
+//    SlideButton slideButton = (SlideButton)findViewById(Meta.getResId(this, "id", "slide_button"));
+//
+//    slideButton.setSlideButtonListener(new SlideButton.SlideButtonListener() {
+//      @Override
+//      public void handleLeftSlide() {
+//          reject(ctx, orderId, mOrderApiService);
+//      }
+//
+//      @Override
+//      public void handleRightSlide() {
+//        accept(ctx, orderId, mOrderApiService);
+//      }
+//    });
 
     Button buttonAccept = (Button)findViewById(Meta.getResId(this, "id", "button_accept"));
     buttonAccept.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        accept(ctx, orderId, orderApiService);
+        accept(ctx, orderId, mOrderApiService);
       }
     });
 
@@ -89,7 +194,7 @@ public class MatchActivity extends Activity implements PushConstants {
     buttonReject.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        reject(ctx, orderId, orderApiService);
+        reject(ctx, orderId, mOrderApiService);
       }
     });
   }
@@ -97,34 +202,122 @@ public class MatchActivity extends Activity implements PushConstants {
   private void accept(final Context ctx, final int orderId, OrderApiService orderApiService) {
     stopAlerts();
 
+    mProgressDialog.setTitle("Aceitando Frete");
+    mProgressDialog.setMessage("Aguarde...");
+    mProgressDialog.setCancelable(false);
+    mProgressDialog.show();
+
     orderApiService.accept(
       new Response.Listener<JSONObject>() {
         @Override
         public void onResponse(JSONObject response) {
-          Toast.makeText(ctx, "Pedido " + orderId + " aceito", Toast.LENGTH_SHORT).show();
+          notifyUser("Aceitar Frete", "Pedido aceito", orderId);
+          startActivity(getHandlerActivityIntent(orderId, true));
+
           finish();
         }
       },
       new Response.ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
-          Toast.makeText(ctx, "Não foi possível aceitar o pedido " + orderId +
-            ". Favor tentar novamente", Toast.LENGTH_LONG).show();
+          String errorMsg = error.getMessage();
+
+          if (errorMsg != null && errorMsg != "") {
+            notifyUser("Aceitar Frete", errorMsg, orderId);
+          } else {
+            notifyUser("Aceitar Frete", "Não foi possível aceitar o pedido.", orderId);
+          }
+
           error.printStackTrace();
+          finish();
         }
       }
     );
   }
 
+  private Intent getHandlerActivityIntent(int orderId, boolean trackOrder) {
+    Bundle extras = new Bundle(mExtras);
+
+    if (trackOrder) {
+      addTrackOrderParams(extras, orderId);
+    }
+
+    Intent notificationIntent = new Intent(this, PushHandlerActivity.class);
+    notificationIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    notificationIntent.putExtra(PUSH_BUNDLE, extras);
+    notificationIntent.putExtra(NOT_ID, orderId);
+
+    return  notificationIntent;
+  }
+
+  private void addTrackOrderParams(Bundle extras, int orderId) {
+    JSONObject intentObj = new JSONObject();
+    JSONObject paramsObj = new JSONObject();
+
+    try {
+      paramsObj.put("orderId", orderId);
+      intentObj.put("page", "orderDelivery");
+      intentObj.put("params", paramsObj);
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+
+    extras.putString("intent", intentObj.toString());
+  }
+
+  private void notifyUser(String title, String text, int notId) {
+    NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+    int requestCode = new Random().nextInt();
+    PendingIntent contentIntent = PendingIntent.getActivity(this, requestCode, getHandlerActivityIntent(notId, false), PendingIntent.FLAG_UPDATE_CURRENT);
+
+    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
+      .setWhen(System.currentTimeMillis())
+      .setSmallIcon(this.getApplicationInfo().icon)
+      .setPriority(PRIORITY_MAX)
+      .setAutoCancel(true);
+
+    if (contentIntent != null) {
+      mBuilder.setContentIntent(contentIntent);
+    }
+
+    mBuilder.setDefaults(Notification.DEFAULT_VIBRATE);
+    mBuilder.setSound(android.provider.Settings.System.DEFAULT_NOTIFICATION_URI);
+
+    NotificationCompat.BigTextStyle bigText = new NotificationCompat.BigTextStyle();
+
+    if (text != null) {
+      mBuilder.setContentText(fromHtml(text));
+
+      bigText.bigText(Html.fromHtml(text));
+      bigText.setBigContentTitle(fromHtml(title));
+
+      mBuilder.setStyle(bigText);
+    }
+
+    CharSequence appName =  this.getPackageManager().getApplicationLabel(this.getApplicationInfo());
+
+    mNotificationManager.notify( (String) appName, notId, mBuilder.build());
+
+    Toast.makeText(this, text, Toast.LENGTH_LONG).show();
+  }
+
+  private Spanned fromHtml(String source) {
+    if (source != null)
+      return Html.fromHtml(source);
+    else
+      return null;
+  }
+
   private void reject(final Context ctx, final int orderId, OrderApiService orderApiService) {
     stopAlerts();
-    rejectedOrders.add(orderId);
+    mRejectedOrders.add(orderId);
+    Toast.makeText(ctx, "Pedido rejeitado", Toast.LENGTH_SHORT).show();
 
     orderApiService.reject(
       new Response.Listener<JSONObject>() {
         @Override
         public void onResponse(JSONObject response) {
-          Toast.makeText(ctx, "Pedido " + orderId + " rejeitado", Toast.LENGTH_SHORT).show();
         }
       },
       new Response.ErrorListener() {
@@ -144,8 +337,24 @@ public class MatchActivity extends Activity implements PushConstants {
     stopAlerts();
   }
 
+  private void startAlerts() {
+//     AudioPlayer.play(this);
+
+     Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+//     v.vibrate(new long[]{100L, 100L}, 0);
+
+     // startCountdown();
+  }
+
   private void stopAlerts() {
-    countDownTimer.cancel();
+    if (mCountDownTimer != null) {
+      mCountDownTimer.cancel();
+    }
+
+    if (mProgressDialog != null) {
+      mProgressDialog.dismiss();
+    }
+
     AudioPlayer.stop(this);
     Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
     v.cancel();
@@ -155,7 +364,7 @@ public class MatchActivity extends Activity implements PushConstants {
     final ProgressBar progressBar = (ProgressBar)findViewById(Meta.getResId(this, "id", "progressBar"));
 
     int interval = 50;
-    countDownTimer = new CountDownTimer(DURATION + interval, interval) {
+    mCountDownTimer = new CountDownTimer(DURATION + interval, interval) {
       @Override
       public void onTick(long millisUntilFinished) {
         progressBar.setProgress((int) millisUntilFinished);
@@ -167,7 +376,8 @@ public class MatchActivity extends Activity implements PushConstants {
         finish();
       }
     };
-    countDownTimer.start();
+
+    mCountDownTimer.start();
   }
 
   private void setIconFont(String id, Typeface font) {
@@ -187,7 +397,6 @@ public class MatchActivity extends Activity implements PushConstants {
     setItemValue("category", jsonOrder.getString("category"));
     setItemValue("freight_type", jsonOrder.getString("freightType"));
     setItemValue("route", jsonOrder.getString("route"));
-    setItemValue("eta", jsonOrder.getString("eta"));
     setItemValue("address", jsonOrder.getString("address"));
 
     RecyclerView recyclerView = (RecyclerView)findViewById(Meta.getResId(this, "id", "additional_services"));
@@ -204,9 +413,12 @@ public class MatchActivity extends Activity implements PushConstants {
   public static void startAlarm(Context context, Bundle extras) {
     Intent intent = new Intent(context, MatchActivity.class);
     intent.putExtra(MATCH_NOTIFICATION_EXTRAS, extras);
-    PendingIntent alarmIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-    AlarmManager alarms = (AlarmManager) context.getSystemService(ALARM_SERVICE);
-    alarms.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), alarmIntent);
+    context.startActivity(intent);
+
+//    PendingIntent alarmIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//
+//    AlarmManager alarms = (AlarmManager) context.getSystemService(ALARM_SERVICE);
+//    alarms.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), alarmIntent);
   }
 }
