@@ -338,12 +338,12 @@ public class MatchActivity extends Activity implements PushConstants {
   }
 
   private void startAlerts() {
-//     AudioPlayer.play(this);
+    AudioPlayer.play(this);
 
-     Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-//     v.vibrate(new long[]{100L, 100L}, 0);
+    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+    v.vibrate(new long[]{100L, 100L}, 0);
 
-     // startCountdown();
+    startCountdown();
   }
 
   private void stopAlerts() {
