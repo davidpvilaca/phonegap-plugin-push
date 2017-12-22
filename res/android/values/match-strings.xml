@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="title_activity_fullscreen">Aceitar Frete</string>
+    <string name="eta_details">até a origem</string>
     <string name="button_accept">Aceitar</string>
     <string name="button_reject">Rejeitar</string>
     <string name="origin">Origem</string>

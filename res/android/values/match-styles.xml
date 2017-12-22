@@ -17,16 +17,4 @@
     <item name="android:backgroundDimEnabled">true</item>
   </style>
 
-  <style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">
-    <item name="android:background">@color/black_overlay</item>
-  </style>
-
-  <style name="MyProgressBar" parent="android:Widget.ProgressBar.Horizontal">
-    <item name="android:radius">10dp</item>
-    <item name="android:gradientRadius">0dp</item>
-    <item name="android:innerRadius">0dp</item>
-    <item name="android:shadowRadius">0</item>
-    <item name="android:bottomLeftRadius">10dp</item>
-  </style>
-
 </resources>

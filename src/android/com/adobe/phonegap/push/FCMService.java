@@ -13,13 +13,14 @@ import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.Paint;
-import android.graphics.Canvas;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -35,6 +36,9 @@ import com.adobe.phonegap.push.location.AppLocation;
 import com.adobe.phonegap.push.location.PolyUtil;
 import com.adobe.phonegap.push.location.SphericalUtil;
 import com.adobe.phonegap.push.match.MatchActivity;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -51,11 +55,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
-
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.model.LatLng;
-import android.location.Location;
 
 @SuppressLint("NewApi")
 public class FCMService extends FirebaseMessagingService implements PushConstants, GoogleApiClient.ConnectionCallbacks {
@@ -81,13 +80,12 @@ public class FCMService extends FirebaseMessagingService implements PushConstant
     Location mLastLocation = null;
     Bundle mExtras = null;
 
-    @Override
+  @Override
     public void onConnected(@Nullable Bundle bundle) {
         if ( ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED ) {
           mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         }
         mGoogleApiClient.disconnect();
-
 
         AppLocation mAppLocation = getLocationObjectFromString( mExtras.getString(LOCATION_OBJECT) );
         if (ContainsLocation(mLastLocation, mAppLocation)) {
