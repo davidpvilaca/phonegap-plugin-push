@@ -413,6 +413,7 @@ public class MatchActivity extends Activity implements PushConstants {
   public static void startAlarm(Context context, Bundle extras) {
     Intent intent = new Intent(context, MatchActivity.class);
     intent.putExtra(MATCH_NOTIFICATION_EXTRAS, extras);
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
     context.startActivity(intent);
 
