@@ -251,18 +251,7 @@ public class MatchActivity extends Activity implements PushConstants {
   }
 
   private void addTrackOrderParams(Bundle extras, int orderId) {
-    JSONObject intentObj = new JSONObject();
-    JSONObject paramsObj = new JSONObject();
-
-    try {
-      paramsObj.put("orderId", orderId);
-      intentObj.put("page", "orderDelivery");
-      intentObj.put("params", paramsObj);
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-
-    extras.putString("intent", intentObj.toString());
+    extras.putString("action", "ORDER_MATCH_ACCEPTED");
   }
 
   private void notifyUser(String title, String text, int notId) {
