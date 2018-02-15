@@ -84,19 +84,23 @@ public class OrderApiService {
 
   private String handleServerError(VolleyError err) {
     NetworkResponse response = err.networkResponse;
+    if (response != null && response.data != null) {
 
-    Log.d("ServerError", new String(response.data));
+      Log.d("ServerError", new String(response.data));
 
-    try {
-      JSONObject result = new JSONObject(new String(response.data));
-      if (result != null && result.has("error")) {
-        return result.getString("error");
+      try {
+
+        JSONObject result = new JSONObject(new String(response.data));
+        if (result != null && result.has("error")) {
+          return result.getString("error");
+        }
+
+      } catch (JSONException e) {
+        e.printStackTrace();
       }
 
-    } catch (JSONException e) {
-      e.printStackTrace();
     }
-
+    
     return null;
   }
 }
