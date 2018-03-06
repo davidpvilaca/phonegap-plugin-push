@@ -99,6 +99,9 @@ public interface PushConstants {
   public static final String ONGOING = "ongoing";
   public static final String LIST_CHANNELS = "listChannels";
   // BeeBee
+  public static final String MATCH_NOTIFICATION = "isMatch";
+  public static final String MATCH_ORDER_DETAILS = "order";
+  public static final String MATCH_NOTIFICATION_EXTRAS = "NOTIFICATION_EXTRAS";
   public static final String LOCATION_AWARENESS = "locationAwareness";
   public static final String LOCATION_OBJECT = "locationObject";
   public static final String LOCATION_TYPE = "type";
@@ -108,9 +111,5 @@ public interface PushConstants {
   public static final String LOCATION_LONGITUDE = "lon";
   public static final String LOCATION_CENTER = "center";
   public static final String LOCATION_RADIUS = "radius";
+  public static final String USER_TOKEN = "userToken";
 }
-
-
-
-
-  

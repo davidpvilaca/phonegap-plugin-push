@@ -1,4 +1,4 @@
-package com.adobe.phonegap.push;
+package com.adobe.phonegap.push.location;
 
 import com.google.android.gms.maps.model.LatLng;
 import java.util.ArrayList;
