@@ -23,6 +23,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -37,6 +38,7 @@ import com.android.volley.VolleyError;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.crash.FirebaseCrash;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -86,7 +88,8 @@ public class MatchActivity extends Activity implements PushConstants {
 
       SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(COM_ADOBE_PHONEGAP_PUSH, Context.MODE_PRIVATE);
       final String userToken = sharedPref.getString(USER_TOKEN, "");
-      mOrderApiService = new OrderApiService(this, orderId, userToken);
+      final String apiUrl = sharedPref.getString(API_URL, "");
+      mOrderApiService = new OrderApiService(this, orderId, userToken, apiUrl);
 
       setButtonEvents(orderId);
       setActivityValues(jsonOrder);
@@ -100,8 +103,6 @@ public class MatchActivity extends Activity implements PushConstants {
   }
 
   private void loadETA(final int orderId) {
-    final Context ctx = this;
-
     ProgressBar etaProgressBar = (ProgressBar) findViewById(Meta.getResId(this, "id", "eta_progressBar"));
 
     int color = ResourcesCompat.getColor(getResources(),
@@ -116,45 +117,27 @@ public class MatchActivity extends Activity implements PushConstants {
           @Override
           public void onSuccess(Location location) {
             // Got last known location. In some rare situations this can be null.
-            if (location != null) {
+            if (location == null) {
+              showETADetails("Erro no GPS.");
+
+              FirebaseCrash.logcat(Log.ERROR, "ETA", "Erro no GPS. Localização nula.");
+            }
+            else {
               mOrderApiService.eta(location,
                 new Response.Listener<JSONObject>() {
                   @Override
                   public void onResponse(JSONObject response) {
-                    try {
-                      int distance = response.getInt("distance");
-                      int durationInTrafficMinutes = response.getInt("durationInTraffic") / 60;
-                      int durationInTrafficHours = 0;
-
-                      if ( durationInTrafficMinutes > 60 ) {
-                        durationInTrafficHours = durationInTrafficMinutes / 60;
-                        durationInTrafficMinutes = durationInTrafficMinutes % 60;
-                      }
-
-                      String textETA = "";
-                      if (durationInTrafficHours > 0){
-                        textETA += durationInTrafficHours + "h ";
-                      }
-
-                      textETA += durationInTrafficMinutes + "min - " + distance + "km";
-
-                      TextView etaView = (TextView) findViewById(Meta.getResId(ctx, "id", "eta"));
-                      etaView.setText(textETA);
-                      etaView.setVisibility(View.VISIBLE);
-
-                      TextView etaDetailsView = (TextView) findViewById(Meta.getResId(ctx, "id", "eta_details"));
-                      etaDetailsView.setVisibility(View.VISIBLE);
-
-                      ProgressBar etaProgressBar = (ProgressBar) findViewById(Meta.getResId(ctx, "id", "eta_progressBar"));
-                      etaProgressBar.setVisibility(View.INVISIBLE);
-                    } catch (JSONException e) {
-                      e.printStackTrace();
-                    }
+                    showETADetails(getETAText(response));
                   }
                 },
                 new Response.ErrorListener() {
                   @Override
                   public void onErrorResponse(VolleyError error) {
+                    showETADetails("Erro no ETA.");
+
+                    FirebaseCrash.logcat(Log.ERROR, "ETA", "Erro no ETA.");
+                    FirebaseCrash.report(error);
+
                     error.printStackTrace();
                   }
                 }
@@ -163,6 +146,58 @@ public class MatchActivity extends Activity implements PushConstants {
           }
         });
     }
+    else {
+      showETADetails("Sem permissão GPS.");
+
+      FirebaseCrash.logcat(Log.ERROR, "ETA", "Sem permissão GPS.");
+    }
+  }
+
+  private String getETAText(JSONObject response)
+  {
+    try {
+      int distance = response.getInt("distance");
+      int durationInTrafficMinutes = response.getInt("durationInTraffic") / 60;
+      int durationInTrafficHours = 0;
+
+      if ( durationInTrafficMinutes > 60 ) {
+        durationInTrafficHours = durationInTrafficMinutes / 60;
+        durationInTrafficMinutes = durationInTrafficMinutes % 60;
+      }
+
+      String textETA = "";
+      if (durationInTrafficHours > 0){
+        textETA += durationInTrafficHours + "h ";
+      }
+
+      textETA += durationInTrafficMinutes + "min - " + distance + "km";
+
+      return textETA;
+
+    } catch (JSONException e) {
+      FirebaseCrash.logcat(Log.ERROR, "ETA", "Erro no ETA. [showETADetails]");
+      FirebaseCrash.report(e);
+
+      e.printStackTrace();
+    }
+
+    return "Erros no ETA.";
+  }
+
+  private void showETADetails(String textETA)
+  {
+    final Context ctx = this;
+
+    TextView etaView = (TextView) findViewById(Meta.getResId(ctx, "id", "eta"));
+    TextView etaDetailsView = (TextView) findViewById(Meta.getResId(ctx, "id", "eta_details"));
+    ProgressBar etaProgressBar = (ProgressBar) findViewById(Meta.getResId(ctx, "id", "eta_progressBar"));
+
+    etaView.setText(textETA);
+    etaView.setVisibility(View.VISIBLE);
+
+    etaDetailsView.setVisibility(View.VISIBLE);
+
+    etaProgressBar.setVisibility(View.INVISIBLE);
   }
 
   private void setButtonEvents(final int orderId) throws JSONException {

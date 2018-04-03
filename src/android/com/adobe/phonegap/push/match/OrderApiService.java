@@ -24,29 +24,27 @@ import java.util.Map;
  */
 
 public class OrderApiService {
-  // TODO URL deve vir do app
-  private static final String BASE_URL = "https://api.dev.beebee.com.br/api/v1/orders/";
-
-  private int mOrderId;
+  
   private String mUserToken;
+  private String mOrderUrl;
   private RequestQueue mQueue;
 
-  public OrderApiService(Context ctx, int orderId, String userToken) {
-    mOrderId = orderId;
+  public OrderApiService(Context ctx, int orderId, String userToken, String apiUrl) {
     mUserToken = userToken;
+    mOrderUrl = apiUrl + "/orders/" + orderId;
     mQueue = Volley.newRequestQueue(ctx);
   }
 
   public void accept(Response.Listener<JSONObject> success, Response.ErrorListener error) {
-    JsonRequest(BASE_URL + mOrderId + "/accept", success, error);
+    JsonRequest(mOrderUrl + "/accept", success, error);
   }
 
   public void reject(Response.Listener<JSONObject> success, Response.ErrorListener error) {
-    JsonRequest(BASE_URL + mOrderId + "/reject", success, error);
+    JsonRequest(mOrderUrl + "/reject", success, error);
   }
 
   public void eta(Location location, Response.Listener<JSONObject> success, Response.ErrorListener error) {
-    JsonRequest(Request.Method.GET, BASE_URL + mOrderId + "/eta?lat=" + location.getLatitude()
+    JsonRequest(Request.Method.GET, mOrderUrl + "/eta?lat=" + location.getLatitude()
       + "&lng=" + location.getLongitude(), null, success, error);
   }
 

@@ -96,5 +96,6 @@ public interface PushConstants {
     public static final String LOCATION_CENTER = "center";
     public static final String LOCATION_RADIUS = "radius";
     public static final String USER_TOKEN = "userToken";
+    public static final String API_URL = "apiUrl";
 
 }
