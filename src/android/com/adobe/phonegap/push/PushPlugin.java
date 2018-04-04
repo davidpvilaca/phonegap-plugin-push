@@ -63,9 +63,11 @@ public class PushPlugin extends CordovaPlugin implements PushConstants {
                     String token = null;
                     String senderID = null;
                     String userToken = null;
+                    String apiUrl = null;
 
                     try {
                         userToken = data.getJSONObject(0).getString(USER_TOKEN);
+                        apiUrl = data.getJSONObject(0).getString(API_URL);
                         jo = data.getJSONObject(0).getJSONObject(ANDROID);
 
                         Log.v(LOG_TAG, "execute: jo=" + jo.toString());
@@ -129,6 +131,7 @@ public class PushPlugin extends CordovaPlugin implements PushConstants {
                         editor.putString(MESSAGE_KEY, jo.optString(MESSAGE_KEY));
                         editor.putString(TITLE_KEY, jo.optString(TITLE_KEY));
                         editor.putString(USER_TOKEN, userToken);
+                        editor.putString(API_URL, apiUrl);
                         editor.commit();
 
                     }
