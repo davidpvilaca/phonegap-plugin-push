@@ -247,7 +247,7 @@ public class MatchActivity extends Activity implements PushConstants {
         @Override
         public void onResponse(JSONObject response) {
           notifyUser("Aceitar Frete", "Pedido aceito", orderId);
-          startActivity(getHandlerActivityIntent(orderId, true));
+          startActivity(getHandlerActivityIntent(orderId, response, true));
 
           finish();
         }
@@ -270,11 +270,11 @@ public class MatchActivity extends Activity implements PushConstants {
     );
   }
 
-  private Intent getHandlerActivityIntent(int orderId, boolean trackOrder) {
+  private Intent getHandlerActivityIntent(int orderId, JSONObject response, boolean trackOrder) {
     Bundle extras = new Bundle(mExtras);
 
     if (trackOrder) {
-      addTrackOrderParams(extras, orderId);
+      addTrackOrderParams(extras, response);
     }
 
     Intent notificationIntent = new Intent(this, PushHandlerActivity.class);
@@ -285,7 +285,13 @@ public class MatchActivity extends Activity implements PushConstants {
     return  notificationIntent;
   }
 
-  private void addTrackOrderParams(Bundle extras, int orderId) {
+  private void addTrackOrderParams(Bundle extras, JSONObject response) {
+    try {
+      extras.putString("driverCompany", response.getJSONObject("driverCompany").toString());
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+
     extras.putString("action", "ORDER_MATCH_ACCEPTED");
   }
 
@@ -293,7 +299,7 @@ public class MatchActivity extends Activity implements PushConstants {
     NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
     int requestCode = new Random().nextInt();
-    PendingIntent contentIntent = PendingIntent.getActivity(this, requestCode, getHandlerActivityIntent(notId, false), PendingIntent.FLAG_UPDATE_CURRENT);
+    PendingIntent contentIntent = PendingIntent.getActivity(this, requestCode, getHandlerActivityIntent(notId, null, false), PendingIntent.FLAG_UPDATE_CURRENT);
 
     NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
       .setWhen(System.currentTimeMillis())
