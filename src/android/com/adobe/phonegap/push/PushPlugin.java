@@ -181,8 +181,12 @@ public class PushPlugin extends CordovaPlugin implements PushConstants {
               Context.MODE_PRIVATE);
           String token = null;
           String senderID = null;
+          String userToken = null;
+          String apiUrl = null;
 
           try {
+            userToken = data.getJSONObject(0).getString(USER_TOKEN);
+            apiUrl = data.getJSONObject(0).getString(API_URL);
             jo = data.getJSONObject(0).getJSONObject(ANDROID);
 
             // If no NotificationChannels exist create the default one
@@ -260,6 +264,8 @@ public class PushPlugin extends CordovaPlugin implements PushConstants {
             editor.putString(SENDER_ID, senderID);
             editor.putString(MESSAGE_KEY, jo.optString(MESSAGE_KEY));
             editor.putString(TITLE_KEY, jo.optString(TITLE_KEY));
+            editor.putString(USER_TOKEN, userToken);
+            editor.putString(API_URL, apiUrl);
             editor.commit();
 
           }
@@ -297,6 +303,7 @@ public class PushPlugin extends CordovaPlugin implements PushConstants {
               editor.remove(CLEAR_NOTIFICATIONS);
               editor.remove(FORCE_SHOW);
               editor.remove(SENDER_ID);
+              editor.remove(USER_TOKEN);
               editor.commit();
             }
 

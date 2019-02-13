@@ -9,27 +9,38 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.graphics.Paint;
-import android.graphics.Canvas;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.WearableExtender;
 import android.support.v4.app.RemoteInput;
+import android.support.v4.content.ContextCompat;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 
+import com.adobe.phonegap.push.location.AppLocation;
+import com.adobe.phonegap.push.location.PolyUtil;
+import com.adobe.phonegap.push.location.SphericalUtil;
+import com.adobe.phonegap.push.match.MatchActivity;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -49,7 +60,7 @@ import java.util.Map;
 import java.security.SecureRandom;
 
 @SuppressLint("NewApi")
-public class FCMService extends FirebaseMessagingService implements PushConstants {
+public class FCMService extends FirebaseMessagingService implements PushConstants, GoogleApiClient.ConnectionCallbacks {
 
   private static final String LOG_TAG = "Push_FCMService";
   private static HashMap<Integer, ArrayList<String>> messageMap = new HashMap<Integer, ArrayList<String>>();
@@ -65,6 +76,71 @@ public class FCMService extends FirebaseMessagingService implements PushConstant
       messageList.clear();
     } else {
       messageList.add(message);
+    }
+  }
+
+  GoogleApiClient mGoogleApiClient = null;
+  Location mLastLocation = null;
+  Bundle mExtras = null;
+
+  @Override
+  public void onConnected(@Nullable Bundle bundle) {
+    if (ContextCompat.checkSelfPermission(this,
+        android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+      mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+    }
+    mGoogleApiClient.disconnect();
+
+    AppLocation mAppLocation = getLocationObjectFromString(mExtras.getString(LOCATION_OBJECT));
+    if (ContainsLocation(mLastLocation, mAppLocation)) {
+      processNotification(mExtras);
+    }
+  }
+
+  private AppLocation getLocationObjectFromString(String json) {
+    try {
+      JSONObject jsonLocation = new JSONObject(json);
+      AppLocation appLocation = new AppLocation();
+
+      appLocation.type = jsonLocation.getString(LOCATION_TYPE);
+      if (appLocation.type.equals(LOCATION_CIRCLE)) {
+        appLocation.radius = jsonLocation.getDouble(LOCATION_RADIUS);
+        appLocation.center = new LatLng(jsonLocation.getJSONObject(LOCATION_CENTER).getDouble(LOCATION_LATITUDE),
+            jsonLocation.getJSONObject(LOCATION_CENTER).getDouble(LOCATION_LONGITUDE));
+      } else if (appLocation.type.equals(LOCATION_POLYGON)) {
+        JSONArray polygon = jsonLocation.getJSONArray(LOCATION_POLYGON);
+        appLocation.polygon = new ArrayList<LatLng>();
+        for (int i = 0; i < polygon.length(); i++) {
+          JSONObject coord = polygon.getJSONObject(i);
+          appLocation.polygon.add(new LatLng(coord.getDouble(LOCATION_LATITUDE), coord.getDouble(LOCATION_LONGITUDE)));
+        }
+      } else {
+        return null;
+      }
+
+      return appLocation;
+    } catch (JSONException ex) {
+      // Json incorreto
+      return null;
+    }
+  }
+
+  @Override
+  public void onConnectionSuspended(int i) {
+
+  }
+
+  private boolean ContainsLocation(Location currentLocation, AppLocation appLocation) {
+    if (appLocation == null || currentLocation == null)
+      return false;
+
+    LatLng currentPoint = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+    if (appLocation.type.equals(LOCATION_POLYGON)) {
+      return PolyUtil.containsLocation(currentPoint, appLocation.polygon, true);
+    } else if (appLocation.type.equals(LOCATION_CIRCLE)) {
+      return SphericalUtil.pointInCircle(currentPoint, appLocation.center, appLocation.radius);
+    } else {
+      return false;
     }
   }
 
@@ -88,6 +164,29 @@ public class FCMService extends FirebaseMessagingService implements PushConstant
     }
 
     if (extras != null && isAvailableSender(from)) {
+      String locationAwareness = extras.getString(LOCATION_AWARENESS);
+
+      if ("1".equals(locationAwareness)) {
+        if (ContextCompat.checkSelfPermission(this,
+            android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+          // Create an instance of GoogleAPIClient.
+          if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this)
+                .addApi(LocationServices.API).build();
+          }
+
+          mExtras = extras;
+
+          mGoogleApiClient.connect();
+        }
+      } else {
+        processNotification(extras);
+      }
+    }
+  }
+
+  private void processNotification(Bundle extras) {
+    if (extras != null) {
       Context applicationContext = getApplicationContext();
 
       SharedPreferences prefs = applicationContext.getSharedPreferences(PushPlugin.COM_ADOBE_PHONEGAP_PUSH,
@@ -96,6 +195,7 @@ public class FCMService extends FirebaseMessagingService implements PushConstant
       boolean clearBadge = prefs.getBoolean(CLEAR_BADGE, false);
       String messageKey = prefs.getString(MESSAGE_KEY, MESSAGE);
       String titleKey = prefs.getString(TITLE_KEY, TITLE);
+      String isMatch = extras.getString(MATCH_NOTIFICATION);
 
       extras = normalizeExtras(applicationContext, extras, messageKey, titleKey);
 
@@ -103,14 +203,19 @@ public class FCMService extends FirebaseMessagingService implements PushConstant
         PushPlugin.setApplicationIconBadgeNumber(getApplicationContext(), 0);
       }
 
+      // if we are in a match notification, show match alarm activity
+      if ("1".equals(isMatch)) {
+        MatchActivity.startAlarm(this, extras);
+      }
       // if we are in the foreground and forceShow is `false` only send data
-      if (!forceShow && PushPlugin.isInForeground()) {
+      else if (!forceShow && PushPlugin.isInForeground()) {
         Log.d(LOG_TAG, "foreground");
         extras.putBoolean(FOREGROUND, true);
         extras.putBoolean(COLDSTART, false);
         PushPlugin.sendExtras(extras);
       }
-      // if we are in the foreground and forceShow is `true`, force show the notification if the data has at least a message or title
+      // if we are in the foreground and forceShow is `true`, force show the
+      // notification if the data has at least a message or title
       else if (forceShow && PushPlugin.isInForeground()) {
         Log.d(LOG_TAG, "foreground force");
         extras.putBoolean(FOREGROUND, true);
@@ -118,7 +223,8 @@ public class FCMService extends FirebaseMessagingService implements PushConstant
 
         showNotificationIfPossible(applicationContext, extras);
       }
-      // if we are not in the foreground always send notification if the data has at least a message or title
+      // if we are not in the foreground always send notification if the data has at
+      // least a message or title
       else {
         Log.d(LOG_TAG, "background");
         extras.putBoolean(FOREGROUND, false);
