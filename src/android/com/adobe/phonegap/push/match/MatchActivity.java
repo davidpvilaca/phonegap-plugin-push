@@ -38,7 +38,6 @@ import com.android.volley.VolleyError;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.crash.FirebaseCrash;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -119,8 +118,6 @@ public class MatchActivity extends Activity implements PushConstants {
             // Got last known location. In some rare situations this can be null.
             if (location == null) {
               showETADetails("Erro no GPS.");
-
-              FirebaseCrash.logcat(Log.ERROR, "ETA", "Erro no GPS. Localização nula.");
             }
             else {
               mOrderApiService.eta(location,
@@ -134,10 +131,6 @@ public class MatchActivity extends Activity implements PushConstants {
                   @Override
                   public void onErrorResponse(VolleyError error) {
                     showETADetails("Erro no ETA.");
-
-                    FirebaseCrash.logcat(Log.ERROR, "ETA", "Erro no ETA.");
-                    FirebaseCrash.report(error);
-
                     error.printStackTrace();
                   }
                 }
@@ -148,8 +141,6 @@ public class MatchActivity extends Activity implements PushConstants {
     }
     else {
       showETADetails("Sem permissão GPS.");
-
-      FirebaseCrash.logcat(Log.ERROR, "ETA", "Sem permissão GPS.");
     }
   }
 
@@ -175,9 +166,6 @@ public class MatchActivity extends Activity implements PushConstants {
       return textETA;
 
     } catch (JSONException e) {
-      FirebaseCrash.logcat(Log.ERROR, "ETA", "Erro no ETA. [showETADetails]");
-      FirebaseCrash.report(e);
-
       e.printStackTrace();
     }
 
