@@ -10,23 +10,24 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.res.ResourcesCompat;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.Spanned;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -92,13 +93,14 @@ public class MatchActivity extends Activity implements PushConstants {
 
       setButtonEvents(orderId);
       setActivityValues(jsonOrder);
-      loadETA(orderId);
+      setActivityScheduledIfNeeded(jsonOrder);
+//      loadETA(orderId);
 
     } catch (JSONException e) {
       e.printStackTrace();
     }
 
-    startAlerts();
+//    startAlerts();
   }
 
   private void loadETA(final int orderId) {
@@ -118,8 +120,7 @@ public class MatchActivity extends Activity implements PushConstants {
             // Got last known location. In some rare situations this can be null.
             if (location == null) {
               showETADetails("Erro no GPS.");
-            }
-            else {
+            } else {
               mOrderApiService.eta(location,
                 new Response.Listener<JSONObject>() {
                   @Override
@@ -138,26 +139,24 @@ public class MatchActivity extends Activity implements PushConstants {
             }
           }
         });
-    }
-    else {
+    } else {
       showETADetails("Sem permissão GPS.");
     }
   }
 
-  private String getETAText(JSONObject response)
-  {
+  private String getETAText(JSONObject response) {
     try {
       int distance = response.getInt("distance");
       int durationInTrafficMinutes = response.getInt("durationInTraffic") / 60;
       int durationInTrafficHours = 0;
 
-      if ( durationInTrafficMinutes > 60 ) {
+      if (durationInTrafficMinutes > 60) {
         durationInTrafficHours = durationInTrafficMinutes / 60;
         durationInTrafficMinutes = durationInTrafficMinutes % 60;
       }
 
       String textETA = "";
-      if (durationInTrafficHours > 0){
+      if (durationInTrafficHours > 0) {
         textETA += durationInTrafficHours + "h ";
       }
 
@@ -172,8 +171,7 @@ public class MatchActivity extends Activity implements PushConstants {
     return "Erros no ETA.";
   }
 
-  private void showETADetails(String textETA)
-  {
+  private void showETADetails(String textETA) {
     final Context ctx = this;
 
     TextView etaView = (TextView) findViewById(Meta.getResId(ctx, "id", "eta"));
@@ -205,7 +203,7 @@ public class MatchActivity extends Activity implements PushConstants {
 //      }
 //    });
 
-    Button buttonAccept = (Button)findViewById(Meta.getResId(this, "id", "button_accept"));
+    Button buttonAccept = (Button) findViewById(Meta.getResId(this, "id", "button_accept"));
     buttonAccept.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
@@ -213,7 +211,7 @@ public class MatchActivity extends Activity implements PushConstants {
       }
     });
 
-    Button buttonReject = (Button)findViewById(Meta.getResId(this, "id", "button_reject"));
+    Button buttonReject = (Button) findViewById(Meta.getResId(this, "id", "button_reject"));
     buttonReject.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
@@ -270,7 +268,7 @@ public class MatchActivity extends Activity implements PushConstants {
     notificationIntent.putExtra(PUSH_BUNDLE, extras);
     notificationIntent.putExtra(NOT_ID, orderId);
 
-    return  notificationIntent;
+    return notificationIntent;
   }
 
   private void addTrackOrderParams(Bundle extras, JSONObject response) {
@@ -313,9 +311,9 @@ public class MatchActivity extends Activity implements PushConstants {
       mBuilder.setStyle(bigText);
     }
 
-    CharSequence appName =  this.getPackageManager().getApplicationLabel(this.getApplicationInfo());
+    CharSequence appName = this.getPackageManager().getApplicationLabel(this.getApplicationInfo());
 
-    mNotificationManager.notify( (String) appName, notId, mBuilder.build());
+    mNotificationManager.notify((String) appName, notId, mBuilder.build());
 
     Toast.makeText(this, text, Toast.LENGTH_LONG).show();
   }
@@ -351,8 +349,8 @@ public class MatchActivity extends Activity implements PushConstants {
 
   @Override
   protected void onDestroy() {
-    super.onDestroy();
     stopAlerts();
+    super.onDestroy();
   }
 
   private void startAlerts() {
@@ -361,7 +359,7 @@ public class MatchActivity extends Activity implements PushConstants {
     Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
     v.vibrate(new long[]{100L, 100L}, 0);
 
-    startCountdown();
+//    startCountdown();
   }
 
   private void stopAlerts() {
@@ -379,7 +377,7 @@ public class MatchActivity extends Activity implements PushConstants {
   }
 
   private void startCountdown() {
-    final ProgressBar progressBar = (ProgressBar)findViewById(Meta.getResId(this, "id", "progressBar"));
+    final ProgressBar progressBar = (ProgressBar) findViewById(Meta.getResId(this, "id", "progressBar"));
 
     int interval = 50;
     mCountDownTimer = new CountDownTimer(DURATION + interval, interval) {
@@ -399,32 +397,57 @@ public class MatchActivity extends Activity implements PushConstants {
   }
 
   private void setIconFont(String id, Typeface font) {
-    TextView view = (TextView)findViewById(Meta.getResId(this, "id", id));
+    TextView view = (TextView) findViewById(Meta.getResId(this, "id", id));
     view.setTypeface(font);
   }
 
   private void setActivityValues(JSONObject jsonOrder) throws JSONException {
     Typeface font = Typeface.createFromAsset(getAssets(), "fonts/icomoon.ttf");
     setIconFont("icon_category", font);
-    setIconFont("icon_freight_type", font);
-    setIconFont("icon_route", font);
+//    setIconFont("icon_freight_type", font);
+//    setIconFont("icon_route", font);
 
     setItemValue("icon_category", IconMap.icons.get(jsonOrder.getString("categoryIcon")));
-    setItemValue("icon_freight_type", IconMap.icons.get(jsonOrder.getString("freightTypeIcon")));
-    setItemValue("icon_route", IconMap.icons.get(jsonOrder.getString("routeIcon")));
+//    setItemValue("icon_freight_type", IconMap.icons.get(jsonOrder.getString("freightTypeIcon")));
+//    setItemValue("icon_route", IconMap.icons.get(jsonOrder.getString("routeIcon")));
     setItemValue("category", jsonOrder.getString("category"));
     setItemValue("freight_type", jsonOrder.getString("freightType"));
     setItemValue("route", jsonOrder.getString("route"));
     setItemValue("address", jsonOrder.getString("address"));
+  }
 
-    RecyclerView recyclerView = (RecyclerView)findViewById(Meta.getResId(this, "id", "additional_services"));
-    RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
-    recyclerView.setLayoutManager(layoutManager);
-    recyclerView.setAdapter(new AdditionalsAdapter(jsonOrder.getJSONArray("optionals"), this));
+  private void setActivityScheduledIfNeeded(JSONObject jsonOrder) throws JSONException {
+    String scheduleDate = jsonOrder.has("scheduleDate") ? jsonOrder.getString("scheduleDate") : null;
+
+    if (scheduleDate != null && !scheduleDate.isEmpty()) {
+      int colorScheduled = ResourcesCompat.getColor(getResources(),
+        Meta.getResId(this, "color", "colorScheduled"), null);
+      int blueBadgeId = Meta.getResId(this, "drawable", "blue_badge");
+
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        ProgressBar pgBar = findViewById(Meta.getResId(this, "id", "progressBar"));
+        pgBar.getProgressDrawable().setTint(colorScheduled);
+      }
+
+      LinearLayout yellowLayout = findViewById(Meta.getResId(this, "id", "layout_yellow"));
+      yellowLayout.setBackgroundResource(blueBadgeId);
+
+      TextView badgeOrigin = findViewById(Meta.getResId(this, "id", "badge_origin"));
+      badgeOrigin.setBackgroundResource(blueBadgeId);
+
+      TextView badgeDestination = findViewById(Meta.getResId(this, "id", "badge_destination"));
+      badgeDestination.setBackgroundResource(blueBadgeId);
+
+      LinearLayout layoutAccept = findViewById(Meta.getResId(this, "id", "layout_accept"));
+      layoutAccept.setBackgroundColor(colorScheduled);
+
+      TextView scheduleDateTextView = findViewById(Meta.getResId(this, "id", "schedule_date"));
+      scheduleDateTextView.setVisibility(View.VISIBLE);
+    }
   }
 
   private void setItemValue(String id, String value) {
-    TextView view = (TextView)findViewById(Meta.getResId(this, "id", id));
+    TextView view = findViewById(Meta.getResId(this, "id", id));
     view.setText(value);
   }
 
