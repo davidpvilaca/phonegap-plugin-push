@@ -25,7 +25,7 @@
     android:id="@+id/fullscreen_content_controls"
     style="?metaButtonBarStyle"
     android:layout_width="match_parent"
-    android:layout_height="420dp"
+    android:layout_height="430dp"
     android:layout_below="@id/progressBar"
     android:layout_marginLeft="15dp"
     android:layout_marginRight="15dp"
@@ -51,8 +51,7 @@
         android:layout_weight="1"
         android:textSize="50sp"
         android:textAlignment="center"
-        android:layout_marginBottom="-10dp"
-        android:text="" />
+        android:layout_marginBottom="-10dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -71,8 +70,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textAlignment="center"
-        android:text="Mini-Van\nCaçamba Fechada"/>
+        android:textAlignment="center" />
     </LinearLayout>
 
     <LinearLayout
@@ -88,13 +86,13 @@
       android:orientation="horizontal">
 
       <TextView
-        android:id="@+id/nLocations"
+        android:id="@+id/locations"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight=".3"
         android:textAlignment="center"
         android:textSize="20sp"
-        android:text="14\npontos"/>
+        android:visibility="gone" />
 
       <TextView
         android:id="@+id/freight_type"
@@ -104,18 +102,15 @@
         android:layout_gravity="center"
         android:textAlignment="center"
         android:textStyle="bold"
-        android:textSize="20sp"
-        android:text="Imediato" />
+        android:textSize="20sp" />
 
       <TextView
         android:id="@+id/route"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_weight=".3"
         android:textAlignment="center"
-        android:textSize="20sp"
-        android:text="Frete\nDinâmico"/>
+        android:textSize="20sp" />
 
     </LinearLayout>
 
@@ -127,8 +122,7 @@
       android:textAlignment="center"
       android:textSize="18sp"
       android:textStyle="bold"
-      android:visibility="gone"
-      android:text="20/07/2018 - 20:00" />
+      android:visibility="invisible" />
 
     <LinearLayout
       android:id="@+id/layout_origin"
@@ -145,8 +139,10 @@
         android:layout_gravity="center"
         android:background="@drawable/yellow_badge"
         android:baselineAligned="false"
-        android:paddingVertical="2dp"
-        android:paddingHorizontal="15dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:paddingRight="15dp"
+        android:paddingLeft="15dp"
         android:layout_marginTop="10dp"
         android:text="@string/origin"
         android:textAlignment="center"
@@ -156,11 +152,9 @@
         android:id="@+id/address"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_gravity="center"
         android:textAlignment="center"
-        android:textSize="15sp"
-        android:text="Rua João Batista Parra, 465\nPraia do Suá - Vitória - ES"/>
+        android:textSize="15sp" />
 
     </LinearLayout>
 
@@ -169,7 +163,9 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_below="@id/layout_origin"
-      android:layout_margin="10dp"
+      android:layout_marginLeft="10dp"
+      android:layout_marginRight="10dp"
+      android:visibility="invisible"
       android:orientation="vertical">
 
       <TextView
@@ -179,22 +175,22 @@
         android:layout_gravity="center"
         android:background="@drawable/yellow_badge"
         android:baselineAligned="false"
-        android:paddingVertical="2dp"
-        android:paddingHorizontal="15dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:paddingRight="15dp"
+        android:paddingLeft="15dp"
         android:layout_marginTop="10dp"
         android:text="@string/destination"
         android:textAlignment="center"
         android:textStyle="bold" />
 
       <TextView
-        android:id="@+id/address_destination"
+        android:id="@+id/destination_address"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_gravity="center"
         android:textAlignment="center"
-        android:textSize="15sp"
-        android:text="Rua João Batista Parra, 465\nPraia do Suá - Vitória - ES"/>
+        android:textSize="15sp" />
 
     </LinearLayout>
 
@@ -214,6 +210,7 @@
       <!--android:thumb="@drawable/slide_thumb" />-->
 
     <LinearLayout
+      android:baselineAligned="false"
       android:id="@+id/layout_buttons"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"

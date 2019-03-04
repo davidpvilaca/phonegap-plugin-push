@@ -29,6 +29,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -81,9 +82,11 @@ public class MatchActivity extends Activity implements PushConstants {
     try {
       JSONObject jsonOrder = new JSONObject(mExtras.getString(MATCH_ORDER_DETAILS));
       final int orderId = jsonOrder.getInt("id");
+      final String uid = jsonOrder.getString("uid");
 
-      if (mRejectedOrders.exists(orderId)) {
+      if (mRejectedOrders.exists(uid)) {
         finish();
+        return;
       }
 
       SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(COM_ADOBE_PHONEGAP_PUSH, Context.MODE_PRIVATE);
@@ -91,7 +94,7 @@ public class MatchActivity extends Activity implements PushConstants {
       final String apiUrl = sharedPref.getString(API_URL, "");
       mOrderApiService = new OrderApiService(this, orderId, userToken, apiUrl);
 
-      setButtonEvents(orderId);
+      setButtonEvents(orderId, uid);
       setActivityValues(jsonOrder);
       setActivityScheduledIfNeeded(jsonOrder);
 //      loadETA(orderId);
@@ -186,7 +189,7 @@ public class MatchActivity extends Activity implements PushConstants {
     etaProgressBar.setVisibility(View.INVISIBLE);
   }
 
-  private void setButtonEvents(final int orderId) throws JSONException {
+  private void setButtonEvents(final int orderId, final String uid) throws JSONException {
     final Context ctx = this;
 
 //    SlideButton slideButton = (SlideButton)findViewById(Meta.getResId(this, "id", "slide_button"));
@@ -194,7 +197,7 @@ public class MatchActivity extends Activity implements PushConstants {
 //    slideButton.setSlideButtonListener(new SlideButton.SlideButtonListener() {
 //      @Override
 //      public void handleLeftSlide() {
-//          reject(ctx, orderId, mOrderApiService);
+//          reject(ctx, orderId, uid, mOrderApiService);
 //      }
 //
 //      @Override
@@ -215,7 +218,7 @@ public class MatchActivity extends Activity implements PushConstants {
     buttonReject.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        reject(ctx, orderId, mOrderApiService);
+        reject(ctx, orderId, uid, mOrderApiService);
       }
     });
   }
@@ -325,9 +328,9 @@ public class MatchActivity extends Activity implements PushConstants {
       return null;
   }
 
-  private void reject(final Context ctx, final int orderId, OrderApiService orderApiService) {
+  private void reject(final Context ctx, final int orderId, final String uid, OrderApiService orderApiService) {
     stopAlerts();
-    mRejectedOrders.add(orderId);
+    mRejectedOrders.add(uid);
     Toast.makeText(ctx, "Pedido rejeitado", Toast.LENGTH_SHORT).show();
 
     orderApiService.reject(
@@ -414,12 +417,26 @@ public class MatchActivity extends Activity implements PushConstants {
     setItemValue("freight_type", jsonOrder.getString("freightType"));
     setItemValue("route", jsonOrder.getString("route"));
     setItemValue("address", jsonOrder.getString("address"));
+
+    String locations = jsonOrder.getString("locations");
+    if (locations != null && !locations.isEmpty() && !locations.equalsIgnoreCase("null")) {
+      TextView locationsTextView = findViewById(Meta.getResId(this, "id", "locations"));
+      setItemValue("locations", locations);
+      locationsTextView.setVisibility(View.VISIBLE);
+    }
+
+    String destinationAddress = jsonOrder.getString("destinationAddress");
+    if (destinationAddress != null && !destinationAddress.isEmpty() && !destinationAddress.equalsIgnoreCase("null")) {
+      LinearLayout layoutDestination = findViewById(Meta.getResId(this, "id", "layout_destination"));
+      setItemValue("destination_address", destinationAddress);
+      layoutDestination.setVisibility(View.VISIBLE);
+    }
   }
 
   private void setActivityScheduledIfNeeded(JSONObject jsonOrder) throws JSONException {
     String scheduleDate = jsonOrder.has("scheduleDate") ? jsonOrder.getString("scheduleDate") : null;
 
-    if (scheduleDate != null && !scheduleDate.isEmpty()) {
+    if (scheduleDate != null && !scheduleDate.isEmpty() && !scheduleDate.equalsIgnoreCase("null")) {
       int colorScheduled = ResourcesCompat.getColor(getResources(),
         Meta.getResId(this, "color", "colorScheduled"), null);
       int blueBadgeId = Meta.getResId(this, "drawable", "blue_badge");
@@ -442,6 +459,7 @@ public class MatchActivity extends Activity implements PushConstants {
       layoutAccept.setBackgroundColor(colorScheduled);
 
       TextView scheduleDateTextView = findViewById(Meta.getResId(this, "id", "schedule_date"));
+      setItemValue("schedule_date", scheduleDate);
       scheduleDateTextView.setVisibility(View.VISIBLE);
     }
   }
