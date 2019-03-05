@@ -194,20 +194,35 @@
 
     </LinearLayout>
 
-    <!--<com.adobe.phonegap.push.match.SlideButton-->
-      <!--android:id="@+id/slide_button"-->
-      <!--android:layout_width="match_parent"-->
-      <!--android:layout_height="50dp"-->
+
+
+    <!--<TextView-->
+      <!--android:id="@+id/reject_label"-->
+      <!--android:layout_height="wrap_content"-->
+      <!--android:layout_width="wrap_content"-->
+      <!--android:layout_gravity="center"-->
+      <!--android:layout_marginStart="22dp"-->
+      <!--android:layout_marginBottom="25dp"-->
       <!--android:layout_alignParentBottom="true"-->
-      <!--android:layout_centerHorizontal="true"-->
-      <!--android:layout_marginBottom="10dp"-->
-      <!--android:layout_marginLeft="10dp"-->
-      <!--android:layout_marginTop="10dp"-->
-      <!--android:background="@drawable/slide_background"-->
-      <!--android:progressDrawable="@android:color/transparent"-->
-      <!--android:clickable="false"-->
-      <!--android:thumbOffset="0dp"-->
-      <!--android:thumb="@drawable/slide_thumb" />-->
+      <!--android:textColor="@color/colorPrimary"-->
+      <!--android:text="Rejeitar"-->
+      <!--android:textStyle="bold"-->
+      <!--android:textSize="20sp" />-->
+
+    <!--<TextView-->
+      <!--android:id="@+id/accept_label"-->
+      <!--android:background="@drawable/blue_badge"-->
+      <!--android:layout_height="wrap_content"-->
+      <!--android:layout_width="wrap_content"-->
+      <!--android:layout_gravity="center"-->
+      <!--android:layout_marginEnd="22dp"-->
+      <!--android:layout_marginBottom="25dp"-->
+      <!--android:layout_alignParentBottom="true"-->
+      <!--android:layout_alignParentEnd="true"-->
+      <!--android:textColor="@color/colorScheduled"-->
+      <!--android:text="Aceitar"-->
+      <!--android:textStyle="bold"-->
+      <!--android:textSize="20sp" />-->
 
     <LinearLayout
       android:baselineAligned="false"
@@ -255,6 +270,22 @@
       </LinearLayout>
 
     </LinearLayout>
+
+    <com.adobe.phonegap.push.match.SlideButton
+      android:id="@+id/slide_button"
+      android:layout_width="match_parent"
+      android:layout_height="50dp"
+      android:layout_alignParentBottom="true"
+      android:layout_centerHorizontal="true"
+      android:layout_marginBottom="-2dp"
+      android:layout_marginStart="0dp"
+      android:layout_marginTop="0dp"
+      android:progressDrawable="@android:color/transparent"
+      android:clickable="false"
+      android:thumbOffset="0dp"
+      android:thumb="@drawable/slide_thumb" />
+
+
   </RelativeLayout>
 
 </RelativeLayout>

@@ -10,10 +10,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -26,10 +24,8 @@ import android.text.Html;
 import android.text.Spanned;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -97,128 +93,28 @@ public class MatchActivity extends Activity implements PushConstants {
       setButtonEvents(orderId, uid);
       setActivityValues(jsonOrder);
       setActivityScheduledIfNeeded(jsonOrder);
-//      loadETA(orderId);
 
     } catch (JSONException e) {
       e.printStackTrace();
     }
 
-//    startAlerts();
+    startAlerts();
   }
 
-  private void loadETA(final int orderId) {
-    ProgressBar etaProgressBar = (ProgressBar) findViewById(Meta.getResId(this, "id", "eta_progressBar"));
-
-    int color = ResourcesCompat.getColor(getResources(),
-      Meta.getResId(this, "color", "colorPrimary"), null);
-    etaProgressBar.getIndeterminateDrawable().setColorFilter(color, PorterDuff.Mode.SRC_IN);
-
-    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-      ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
-      mFusedLocationClient.getLastLocation()
-        .addOnSuccessListener(this, new OnSuccessListener<Location>() {
-          @Override
-          public void onSuccess(Location location) {
-            // Got last known location. In some rare situations this can be null.
-            if (location == null) {
-              showETADetails("Erro no GPS.");
-            } else {
-              mOrderApiService.eta(location,
-                new Response.Listener<JSONObject>() {
-                  @Override
-                  public void onResponse(JSONObject response) {
-                    showETADetails(getETAText(response));
-                  }
-                },
-                new Response.ErrorListener() {
-                  @Override
-                  public void onErrorResponse(VolleyError error) {
-                    showETADetails("Erro no ETA.");
-                    error.printStackTrace();
-                  }
-                }
-              );
-            }
-          }
-        });
-    } else {
-      showETADetails("Sem permissão GPS.");
-    }
-  }
-
-  private String getETAText(JSONObject response) {
-    try {
-      int distance = response.getInt("distance");
-      int durationInTrafficMinutes = response.getInt("durationInTraffic") / 60;
-      int durationInTrafficHours = 0;
-
-      if (durationInTrafficMinutes > 60) {
-        durationInTrafficHours = durationInTrafficMinutes / 60;
-        durationInTrafficMinutes = durationInTrafficMinutes % 60;
-      }
-
-      String textETA = "";
-      if (durationInTrafficHours > 0) {
-        textETA += durationInTrafficHours + "h ";
-      }
-
-      textETA += durationInTrafficMinutes + "min - " + distance + "km";
-
-      return textETA;
-
-    } catch (JSONException e) {
-      e.printStackTrace();
-    }
-
-    return "Erros no ETA.";
-  }
-
-  private void showETADetails(String textETA) {
+  private void setButtonEvents(final int orderId, final String uid) {
     final Context ctx = this;
 
-    TextView etaView = (TextView) findViewById(Meta.getResId(ctx, "id", "eta"));
-    TextView etaDetailsView = (TextView) findViewById(Meta.getResId(ctx, "id", "eta_details"));
-    ProgressBar etaProgressBar = (ProgressBar) findViewById(Meta.getResId(ctx, "id", "eta_progressBar"));
+    SlideButton slideButton = findViewById(Meta.getResId(this, "id", "slide_button"));
 
-    etaView.setText(textETA);
-    etaView.setVisibility(View.VISIBLE);
-
-    etaDetailsView.setVisibility(View.VISIBLE);
-
-    etaProgressBar.setVisibility(View.INVISIBLE);
-  }
-
-  private void setButtonEvents(final int orderId, final String uid) throws JSONException {
-    final Context ctx = this;
-
-//    SlideButton slideButton = (SlideButton)findViewById(Meta.getResId(this, "id", "slide_button"));
-//
-//    slideButton.setSlideButtonListener(new SlideButton.SlideButtonListener() {
-//      @Override
-//      public void handleLeftSlide() {
-//          reject(ctx, orderId, uid, mOrderApiService);
-//      }
-//
-//      @Override
-//      public void handleRightSlide() {
-//        accept(ctx, orderId, mOrderApiService);
-//      }
-//    });
-
-    Button buttonAccept = (Button) findViewById(Meta.getResId(this, "id", "button_accept"));
-    buttonAccept.setOnClickListener(new View.OnClickListener() {
+    slideButton.setSlideButtonListener(new SlideButton.SlideButtonListener() {
       @Override
-      public void onClick(View view) {
+      public void handleLeftSlide() {
+          reject(ctx, orderId, uid, mOrderApiService);
+      }
+
+      @Override
+      public void handleRightSlide() {
         accept(ctx, orderId, mOrderApiService);
-      }
-    });
-
-    Button buttonReject = (Button) findViewById(Meta.getResId(this, "id", "button_reject"));
-    buttonReject.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        reject(ctx, orderId, uid, mOrderApiService);
       }
     });
   }
@@ -362,7 +258,7 @@ public class MatchActivity extends Activity implements PushConstants {
     Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
     v.vibrate(new long[]{100L, 100L}, 0);
 
-//    startCountdown();
+    startCountdown();
   }
 
   private void stopAlerts() {
@@ -435,6 +331,7 @@ public class MatchActivity extends Activity implements PushConstants {
 
   private void setActivityScheduledIfNeeded(JSONObject jsonOrder) throws JSONException {
     String scheduleDate = jsonOrder.has("scheduleDate") ? jsonOrder.getString("scheduleDate") : null;
+    SlideButton slideButton = (SlideButton)findViewById(Meta.getResId(this, "id", "slide_button"));
 
     if (scheduleDate != null && !scheduleDate.isEmpty() && !scheduleDate.equalsIgnoreCase("null")) {
       int colorScheduled = ResourcesCompat.getColor(getResources(),
@@ -461,6 +358,12 @@ public class MatchActivity extends Activity implements PushConstants {
       TextView scheduleDateTextView = findViewById(Meta.getResId(this, "id", "schedule_date"));
       setItemValue("schedule_date", scheduleDate);
       scheduleDateTextView.setVisibility(View.VISIBLE);
+
+      slideButton.setBackgroundColor(colorScheduled);
+    } else {
+      int colorAccent = ResourcesCompat.getColor(getResources(),
+        Meta.getResId(this, "color", "colorAccent"), null);
+      slideButton.setBackgroundColor(colorAccent);
     }
   }
 
@@ -475,10 +378,5 @@ public class MatchActivity extends Activity implements PushConstants {
     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
     context.startActivity(intent);
-
-//    PendingIntent alarmIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-//
-//    AlarmManager alarms = (AlarmManager) context.getSystemService(ALARM_SERVICE);
-//    alarms.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), alarmIntent);
   }
 }
