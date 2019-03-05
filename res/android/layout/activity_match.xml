@@ -25,7 +25,7 @@
     android:id="@+id/fullscreen_content_controls"
     style="?metaButtonBarStyle"
     android:layout_width="match_parent"
-    android:layout_height="400dp"
+    android:layout_height="430dp"
     android:layout_below="@id/progressBar"
     android:layout_marginLeft="15dp"
     android:layout_marginRight="15dp"
@@ -48,25 +48,10 @@
         android:id="@+id/icon_category"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight=".3"
-        android:textSize="40sp"
-        android:textAlignment="center" />
-
-      <TextView
-        android:id="@+id/icon_freight_type"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight=".3"
-        android:textSize="40sp"
-        android:textAlignment="center" />
-
-      <TextView
-        android:id="@+id/icon_route"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight=".3"
-        android:textSize="40sp"
-        android:textAlignment="center" />
+        android:layout_weight="1"
+        android:textSize="50sp"
+        android:textAlignment="center"
+        android:layout_marginBottom="-10dp" />
     </LinearLayout>
 
     <LinearLayout
@@ -84,124 +69,163 @@
         android:id="@+id/category"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight=".3"
+        android:layout_weight="1"
         android:textAlignment="center" />
+    </LinearLayout>
+
+    <LinearLayout
+      android:id="@+id/layout_yellow"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/details"
+      android:layout_centerHorizontal="true"
+      android:layout_marginLeft="10dp"
+      android:layout_marginRight="10dp"
+      android:background="@drawable/yellow_badge"
+      android:padding="10dp"
+      android:orientation="horizontal">
+
+      <TextView
+        android:id="@+id/locations"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight=".3"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:visibility="gone" />
 
       <TextView
         android:id="@+id/freight_type"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight=".3"
-        android:textAlignment="center" />
+        android:layout_gravity="center"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        android:textSize="20sp" />
 
       <TextView
         android:id="@+id/route"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_weight=".3"
-        android:textAlignment="center" />
+        android:textAlignment="center"
+        android:textSize="20sp" />
+
     </LinearLayout>
 
-    <RelativeLayout
-      android:id="@+id/layout_eta"
+    <TextView
+      android:id="@+id/schedule_date"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_below="@id/details"
-      android:layout_marginLeft="10dp"
-      android:layout_marginRight="10dp"
-      android:background="@drawable/yellow_badge"
-      android:padding="10dp">
-
-      <ProgressBar
-        android:id="@+id/eta_progressBar"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"/>
-
-      <TextView
-        android:id="@+id/eta"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:textAlignment="center"
-        android:textStyle="bold"
-        android:visibility="invisible" />
-
-      <TextView
-        android:id="@+id/eta_details"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/eta"
-        android:layout_centerHorizontal="true"
-        android:textAlignment="center"
-        android:text="@string/eta_details"
-        android:textSize="14sp"
-        android:visibility="invisible"/>
-
-    </RelativeLayout>
+      android:layout_below="@id/layout_yellow"
+      android:textAlignment="center"
+      android:textSize="18sp"
+      android:textStyle="bold"
+      android:visibility="invisible" />
 
     <LinearLayout
       android:id="@+id/layout_origin"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_below="@id/layout_eta"
+      android:layout_below="@id/schedule_date"
       android:layout_margin="10dp"
-      android:orientation="horizontal">
+      android:orientation="vertical">
 
       <TextView
         android:id="@+id/badge_origin"
-        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
         android:layout_gravity="center"
-        android:layout_weight=".2"
         android:background="@drawable/yellow_badge"
         android:baselineAligned="false"
-        android:padding="2dp"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:paddingRight="15dp"
+        android:paddingLeft="15dp"
+        android:layout_marginTop="10dp"
         android:text="@string/origin"
         android:textAlignment="center"
         android:textStyle="bold" />
 
       <TextView
         android:id="@+id/address"
-        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_gravity="start"
-        android:layout_marginLeft="10dp"
-        android:layout_weight=".8"
-        android:textAlignment="textStart" />
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        android:textAlignment="center"
+        android:textSize="15sp" />
 
     </LinearLayout>
 
-    <TextView
-      android:id="@+id/additional_services_title"
+    <LinearLayout
+      android:id="@+id/layout_destination"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_below="@id/layout_origin"
       android:layout_marginLeft="10dp"
       android:layout_marginRight="10dp"
-      android:text="@string/additional_services"
-      android:textStyle="bold" />
+      android:visibility="invisible"
+      android:orientation="vertical">
 
-    <!--<com.adobe.phonegap.push.match.SlideButton-->
-      <!--android:id="@+id/slide_button"-->
-      <!--android:layout_width="match_parent"-->
-      <!--android:layout_height="50dp"-->
+      <TextView
+        android:id="@+id/badge_destination"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        android:background="@drawable/yellow_badge"
+        android:baselineAligned="false"
+        android:paddingTop="2dp"
+        android:paddingBottom="2dp"
+        android:paddingRight="15dp"
+        android:paddingLeft="15dp"
+        android:layout_marginTop="10dp"
+        android:text="@string/destination"
+        android:textAlignment="center"
+        android:textStyle="bold" />
+
+      <TextView
+        android:id="@+id/destination_address"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center"
+        android:textAlignment="center"
+        android:textSize="15sp" />
+
+    </LinearLayout>
+
+
+
+    <!--<TextView-->
+      <!--android:id="@+id/reject_label"-->
+      <!--android:layout_height="wrap_content"-->
+      <!--android:layout_width="wrap_content"-->
+      <!--android:layout_gravity="center"-->
+      <!--android:layout_marginStart="22dp"-->
+      <!--android:layout_marginBottom="25dp"-->
       <!--android:layout_alignParentBottom="true"-->
-      <!--android:layout_centerHorizontal="true"-->
-      <!--android:layout_marginBottom="10dp"-->
-      <!--android:layout_marginLeft="10dp"-->
-      <!--android:layout_marginTop="10dp"-->
-      <!--android:background="@drawable/slide_background"-->
-      <!--android:progressDrawable="@android:color/transparent"-->
-      <!--android:clickable="false"-->
-      <!--android:thumbOffset="0dp"-->
-      <!--android:thumb="@drawable/slide_thumb" />-->
+      <!--android:textColor="@color/colorPrimary"-->
+      <!--android:text="Rejeitar"-->
+      <!--android:textStyle="bold"-->
+      <!--android:textSize="20sp" />-->
+
+    <!--<TextView-->
+      <!--android:id="@+id/accept_label"-->
+      <!--android:background="@drawable/blue_badge"-->
+      <!--android:layout_height="wrap_content"-->
+      <!--android:layout_width="wrap_content"-->
+      <!--android:layout_gravity="center"-->
+      <!--android:layout_marginEnd="22dp"-->
+      <!--android:layout_marginBottom="25dp"-->
+      <!--android:layout_alignParentBottom="true"-->
+      <!--android:layout_alignParentEnd="true"-->
+      <!--android:textColor="@color/colorScheduled"-->
+      <!--android:text="Aceitar"-->
+      <!--android:textStyle="bold"-->
+      <!--android:textSize="20sp" />-->
 
     <LinearLayout
+      android:baselineAligned="false"
       android:id="@+id/layout_buttons"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
@@ -229,6 +253,7 @@
       </LinearLayout>
 
       <LinearLayout
+        android:id="@+id/layout_accept"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="0dp"
@@ -246,16 +271,21 @@
 
     </LinearLayout>
 
-    <android.support.v7.widget.RecyclerView
-      android:id="@+id/additional_services"
+    <com.adobe.phonegap.push.match.SlideButton
+      android:id="@+id/slide_button"
       android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:layout_below="@+id/additional_services_title"
-      android:layout_above="@id/layout_buttons"
-      android:layout_marginLeft="10dp"
-      android:layout_marginBottom="10dp"
-      android:layout_marginRight="10dp"
-      android:scrollbars="vertical" />
+      android:layout_height="50dp"
+      android:layout_alignParentBottom="true"
+      android:layout_centerHorizontal="true"
+      android:layout_marginBottom="-2dp"
+      android:layout_marginStart="0dp"
+      android:layout_marginTop="0dp"
+      android:progressDrawable="@android:color/transparent"
+      android:clickable="false"
+      android:thumbOffset="0dp"
+      android:thumb="@drawable/slide_thumb" />
+
+
   </RelativeLayout>
 
 </RelativeLayout>

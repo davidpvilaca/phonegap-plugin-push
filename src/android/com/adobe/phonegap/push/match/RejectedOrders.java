@@ -17,39 +17,39 @@ public class RejectedOrders {
 
   private Activity mActivity;
   private static final String REJECTED_ORDERS = "REJECTED_ORDERS";
-  private static final int MAX_LENGTH = 100;
+  private static final int MAX_LENGTH = 50;
 
   public RejectedOrders(Activity activity){
     mActivity = activity;
   }
 
-  public void add(int orderId) {
+  public void add(String uid) {
     SharedPreferences prefs = mActivity.getPreferences(Context.MODE_PRIVATE);
     SharedPreferences.Editor prefsEditor = prefs.edit();
 
     if (prefs.contains(REJECTED_ORDERS)) {
       String strRejectedOrders = prefs.getString(REJECTED_ORDERS, null);
       ArrayList<String> rejectedOrders = new ArrayList<String>(Arrays.asList(strRejectedOrders.split(",")));
-      rejectedOrders.add("" + orderId);
+      rejectedOrders.add(uid);
 
       int begin = rejectedOrders.size() > MAX_LENGTH ? rejectedOrders.size() - MAX_LENGTH : 0;
       int end = rejectedOrders.size();
       prefsEditor.putString(REJECTED_ORDERS, TextUtils.join(",", rejectedOrders.subList(begin, end)));
     } else {
-      prefsEditor.putString(REJECTED_ORDERS, "" + orderId);
+      prefsEditor.putString(REJECTED_ORDERS, uid);
     }
 
     prefsEditor.apply();
   }
 
-  public boolean exists(int id){
+  public boolean exists(String poolDateId){
     SharedPreferences prefs = mActivity.getPreferences(Context.MODE_PRIVATE);
 
     if (prefs.contains(REJECTED_ORDERS)) {
       String strRejectedOrders = prefs.getString(REJECTED_ORDERS, null);
       List<String> rejectedOrders = Arrays.asList(strRejectedOrders.split(","));
 
-      return rejectedOrders.contains("" + id);
+      return rejectedOrders.contains(poolDateId);
     }
 
     return false;

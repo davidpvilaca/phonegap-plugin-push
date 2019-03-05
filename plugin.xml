@@ -81,6 +81,7 @@
     <source-file src="src/android/com/adobe/phonegap/push/PushDismissedHandler.java" target-dir="src/com/adobe/phonegap/push/"/>
 
     <source-file src="res/android/drawable/yellow_badge.xml" target-dir="res/drawable/"/>
+    <source-file src="res/android/drawable/blue_badge.xml" target-dir="res/drawable/"/>
     <source-file src="res/android/layout/activity_match.xml" target-dir="res/layout/"/>
     <source-file src="res/android/values/match-attrs.xml" target-dir="res/values/"/>
     <source-file src="res/android/values/match-colors.xml" target-dir="res/values/"/>

@@ -2,6 +2,7 @@ package com.adobe.phonegap.push.match;
 
 import android.content.Context;
 import android.location.Location;
+import android.os.Build;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -10,21 +11,32 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.SSLContext;
+import java.net.Socket;
 
 /**
  * Created by alvaro.menezes on 06/12/2017.
  */
 
 public class OrderApiService {
-  
+
   private String mUserToken;
   private String mOrderUrl;
   private RequestQueue mQueue;
@@ -32,7 +44,25 @@ public class OrderApiService {
   public OrderApiService(Context ctx, int orderId, String userToken, String apiUrl) {
     mUserToken = userToken;
     mOrderUrl = apiUrl + "/orders/" + orderId;
-    mQueue = Volley.newRequestQueue(ctx);
+
+    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
+      HurlStack stack = null;
+
+      try {
+        stack = new HurlStack(null, new TLSSocketFactory());
+      } catch (KeyManagementException e) {
+        e.printStackTrace();
+        Log.d("OrderApiService", "Could not create new stack for TLS v1.2");
+        stack = new HurlStack();
+      } catch (NoSuchAlgorithmException e) {
+        e.printStackTrace();
+        Log.d("OrderApiService", "Could not create new stack for TLS v1.2");
+        stack = new HurlStack();
+      }
+      mQueue = Volley.newRequestQueue(ctx, stack);
+    } else {
+      mQueue = Volley.newRequestQueue(ctx);
+    }
   }
 
   public void accept(Response.Listener<JSONObject> success, Response.ErrorListener error) {
@@ -96,9 +126,61 @@ public class OrderApiService {
       } catch (JSONException e) {
         e.printStackTrace();
       }
-
     }
-    
+
     return null;
+  }
+
+  public class TLSSocketFactory extends SSLSocketFactory {
+
+    private SSLSocketFactory internalSSLSocketFactory;
+
+    public TLSSocketFactory() throws KeyManagementException, NoSuchAlgorithmException {
+      SSLContext context = SSLContext.getInstance("TLS");
+      context.init(null, null, null);
+      internalSSLSocketFactory = context.getSocketFactory();
+    }
+
+    @Override
+    public String[] getDefaultCipherSuites() {
+      return internalSSLSocketFactory.getDefaultCipherSuites();
+    }
+
+    @Override
+    public String[] getSupportedCipherSuites() {
+      return internalSSLSocketFactory.getSupportedCipherSuites();
+    }
+
+    @Override
+    public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException {
+      return enableTLSOnSocket(internalSSLSocketFactory.createSocket(s, host, port, autoClose));
+    }
+
+    @Override
+    public Socket createSocket(String host, int port) throws IOException, UnknownHostException {
+      return enableTLSOnSocket(internalSSLSocketFactory.createSocket(host, port));
+    }
+
+    @Override
+    public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException, UnknownHostException {
+      return enableTLSOnSocket(internalSSLSocketFactory.createSocket(host, port, localHost, localPort));
+    }
+
+    @Override
+    public Socket createSocket(InetAddress host, int port) throws IOException {
+      return enableTLSOnSocket(internalSSLSocketFactory.createSocket(host, port));
+    }
+
+    @Override
+    public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException {
+      return enableTLSOnSocket(internalSSLSocketFactory.createSocket(address, port, localAddress, localPort));
+    }
+
+    private Socket enableTLSOnSocket(Socket socket) {
+      if(socket != null && (socket instanceof SSLSocket)) {
+        ((SSLSocket)socket).setEnabledProtocols(new String[] {"TLSv1.1", "TLSv1.2"});
+      }
+      return socket;
+    }
   }
 }
