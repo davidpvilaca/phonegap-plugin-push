@@ -73,6 +73,7 @@
     <source-file src="src/android/com/adobe/phonegap/push/match/Meta.java" target-dir="src/com/adobe/phonegap/push/match/"/>
     <source-file src="src/android/com/adobe/phonegap/push/match/OrderApiService.java" target-dir="src/com/adobe/phonegap/push/match/"/>
     <source-file src="src/android/com/adobe/phonegap/push/match/RejectedOrders.java" target-dir="src/com/adobe/phonegap/push/match/"/>
+    <source-file src="src/android/com/adobe/phonegap/push/match/SlideButton.java" target-dir="src/com/adobe/phonegap/push/match/"/>
     <source-file src="src/android/com/adobe/phonegap/push/PushConstants.java" target-dir="src/com/adobe/phonegap/push/"/>
     <source-file src="src/android/com/adobe/phonegap/push/PushHandlerActivity.java" target-dir="src/com/adobe/phonegap/push/"/>
     <source-file src="src/android/com/adobe/phonegap/push/PushInstanceIDListenerService.java" target-dir="src/com/adobe/phonegap/push/"/>
@@ -80,8 +81,10 @@
     <source-file src="src/android/com/adobe/phonegap/push/BackgroundActionButtonHandler.java" target-dir="src/com/adobe/phonegap/push/"/>
     <source-file src="src/android/com/adobe/phonegap/push/PushDismissedHandler.java" target-dir="src/com/adobe/phonegap/push/"/>
 
-    <source-file src="res/android/drawable/yellow_badge.xml" target-dir="res/drawable/"/>
     <source-file src="res/android/drawable/blue_badge.xml" target-dir="res/drawable/"/>
+    <source-file src="res/android/drawable/slide_thumb_animated.xml" target-dir="res/drawable/"/>
+    <source-file src="res/android/drawable/slide_thumb.xml" target-dir="res/drawable/"/>
+    <source-file src="res/android/drawable/yellow_badge.xml" target-dir="res/drawable/"/>
     <source-file src="res/android/layout/activity_match.xml" target-dir="res/layout/"/>
     <source-file src="res/android/values/match-attrs.xml" target-dir="res/values/"/>
     <source-file src="res/android/values/match-colors.xml" target-dir="res/values/"/>
