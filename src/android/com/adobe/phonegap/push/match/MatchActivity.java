@@ -322,9 +322,15 @@ public class MatchActivity extends Activity implements PushConstants {
     }
 
     String destinationAddress = jsonOrder.getString("destinationAddress");
+    String firstObservations = jsonOrder.getString("firstObservations");
+    LinearLayout layoutDestination = findViewById(Meta.getResId(this, "id", "layout_destination"));
     if (destinationAddress != null && !destinationAddress.isEmpty() && !destinationAddress.equalsIgnoreCase("null")) {
-      LinearLayout layoutDestination = findViewById(Meta.getResId(this, "id", "layout_destination"));
+      setItemValue("badge_destination", "Destino Final");
       setItemValue("destination_address", destinationAddress);
+      layoutDestination.setVisibility(View.VISIBLE);
+    } else if (firstObservations != null && !firstObservations.isEmpty() && !firstObservations.equalsIgnoreCase("null")) {
+      setItemValue("badge_destination", "Instruções");
+      setItemValue("destination_address", firstObservations);
       layoutDestination.setVisibility(View.VISIBLE);
     }
   }
