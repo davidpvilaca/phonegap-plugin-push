@@ -69,7 +69,10 @@ public class SlideButton extends android.support.v7.widget.AppCompatSeekBar {
     setMax(MAX);
     setProgress(INITIAL_VALUE);
 
-    this.getBackground().setAlpha(0);
+    Drawable bg = this.getBackground();
+    if (bg != null) {
+      bg.setAlpha(0);
+    }
 
     Drawable anim;
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
