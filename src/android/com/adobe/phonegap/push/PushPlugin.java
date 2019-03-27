@@ -185,7 +185,7 @@ public class PushPlugin extends CordovaPlugin implements PushConstants {
           String apiUrl = null;
 
           try {
-            userToken = data.getJSONObject(0).getString(USER_TOKEN);
+            userToken = data.getJSONObject(0).has(USER_TOKEN) ? data.getJSONObject(0).getString(USER_TOKEN) : null;
             apiUrl = data.getJSONObject(0).getString(API_URL);
             jo = data.getJSONObject(0).getJSONObject(ANDROID);
 
