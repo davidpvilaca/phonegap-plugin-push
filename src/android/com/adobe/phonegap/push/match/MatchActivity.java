@@ -1,23 +1,20 @@
 package com.adobe.phonegap.push.match;
 
-import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.graphics.PorterDuff;
 import android.graphics.Typeface;
-import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Vibrator;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.text.Html;
@@ -35,7 +32,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,6 +51,7 @@ public class MatchActivity extends Activity implements PushConstants {
   private OrderApiService mOrderApiService = null;
   private FusedLocationProviderClient mFusedLocationClient = null;
   private ProgressDialog mProgressDialog = null;
+  private AlertDialog mAlertDialog = null;
   private Bundle mExtras = null;
 
   @Override
@@ -109,7 +106,7 @@ public class MatchActivity extends Activity implements PushConstants {
     slideButton.setSlideButtonListener(new SlideButton.SlideButtonListener() {
       @Override
       public void handleLeftSlide() {
-          reject(ctx, orderId, uid, mOrderApiService);
+        reject(ctx, orderId, uid, mOrderApiService);
       }
 
       @Override
@@ -141,15 +138,23 @@ public class MatchActivity extends Activity implements PushConstants {
         @Override
         public void onErrorResponse(VolleyError error) {
           String errorMsg = error.getMessage();
+          AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+          builder.setTitle("Ops...");
+          builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+              finish();
+            }
+          });
 
           if (errorMsg != null && errorMsg != "") {
-            notifyUser("Aceitar Frete", errorMsg, orderId);
+            builder.setMessage(errorMsg);
           } else {
-            notifyUser("Aceitar Frete", "Não foi possível aceitar o pedido.", orderId);
+            builder.setMessage("Não foi possível aceitar o pedido :(");
           }
 
+          mAlertDialog = builder.show();
+          mProgressDialog.dismiss();
           error.printStackTrace();
-          finish();
         }
       }
     );
@@ -268,6 +273,10 @@ public class MatchActivity extends Activity implements PushConstants {
 
     if (mProgressDialog != null) {
       mProgressDialog.dismiss();
+    }
+
+    if (mAlertDialog != null) {
+      mAlertDialog.dismiss();
     }
 
     AudioPlayer.stop(this);
