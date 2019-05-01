@@ -71,7 +71,7 @@
     <source-file src="src/android/com/adobe/phonegap/push/match/IconMap.java" target-dir="src/com/adobe/phonegap/push/match/"/>
     <source-file src="src/android/com/adobe/phonegap/push/match/MatchActivity.java" target-dir="src/com/adobe/phonegap/push/match/"/>
     <source-file src="src/android/com/adobe/phonegap/push/match/Meta.java" target-dir="src/com/adobe/phonegap/push/match/"/>
-    <source-file src="src/android/com/adobe/phonegap/push/match/OrderApiService.java" target-dir="src/com/adobe/phonegap/push/match/"/>
+    <source-file src="src/android/com/adobe/phonegap/push/match/BeeBeeApiService.java" target-dir="src/com/adobe/phonegap/push/match/"/>
     <source-file src="src/android/com/adobe/phonegap/push/match/RejectedOrders.java" target-dir="src/com/adobe/phonegap/push/match/"/>
     <source-file src="src/android/com/adobe/phonegap/push/match/SlideButton.java" target-dir="src/com/adobe/phonegap/push/match/"/>
     <source-file src="src/android/com/adobe/phonegap/push/PushConstants.java" target-dir="src/com/adobe/phonegap/push/"/>

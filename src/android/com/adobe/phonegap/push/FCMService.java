@@ -37,6 +37,7 @@ import android.util.Log;
 import com.adobe.phonegap.push.location.AppLocation;
 import com.adobe.phonegap.push.location.PolyUtil;
 import com.adobe.phonegap.push.location.SphericalUtil;
+import com.adobe.phonegap.push.match.BeeBeeApiService;
 import com.adobe.phonegap.push.match.MatchActivity;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -196,7 +197,8 @@ public class FCMService extends FirebaseMessagingService implements PushConstant
       String messageKey = prefs.getString(MESSAGE_KEY, MESSAGE);
       String titleKey = prefs.getString(TITLE_KEY, TITLE);
       String isMatch = extras.getString(MATCH_NOTIFICATION);
-
+      String isPing = extras.getString(PING_NOTIFICATION);
+      
       extras = normalizeExtras(applicationContext, extras, messageKey, titleKey);
 
       if (clearBadge) {
@@ -206,6 +208,14 @@ public class FCMService extends FirebaseMessagingService implements PushConstant
       // if we are in a match notification, show match alarm activity
       if ("1".equals(isMatch)) {
         MatchActivity.startAlarm(this, extras);
+      }
+      // if we are in a ping notification, respond with a pong
+      else if ("1".equals(isPing)) {
+        String userToken = prefs.getString(USER_TOKEN, "");
+        String apiUrl = prefs.getString(API_URL, "");
+        BeeBeeApiService mBeeBeeApiService = new BeeBeeApiService(applicationContext, 0, userToken, apiUrl);
+
+        mBeeBeeApiService.pong();
       }
       // if we are in the foreground and forceShow is `false` only send data
       else if (!forceShow && PushPlugin.isInForeground()) {

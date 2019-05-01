@@ -35,15 +35,17 @@ import java.net.Socket;
  * Created by alvaro.menezes on 06/12/2017.
  */
 
-public class OrderApiService {
+public class BeeBeeApiService {
 
   private String mUserToken;
   private String mOrderUrl;
+  private String mUserUrl;
   private RequestQueue mQueue;
 
-  public OrderApiService(Context ctx, int orderId, String userToken, String apiUrl) {
+  public BeeBeeApiService(Context ctx, int orderId, String userToken, String apiUrl) {
     mUserToken = userToken;
     mOrderUrl = apiUrl + "/orders/" + orderId;
+    mUserUrl = apiUrl + "/users";
 
     if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
       HurlStack stack = null;
@@ -52,11 +54,11 @@ public class OrderApiService {
         stack = new HurlStack(null, new TLSSocketFactory());
       } catch (KeyManagementException e) {
         e.printStackTrace();
-        Log.d("OrderApiService", "Could not create new stack for TLS v1.2");
+        Log.d("BeeBeeApiService", "Could not create new stack for TLS v1.2");
         stack = new HurlStack();
       } catch (NoSuchAlgorithmException e) {
         e.printStackTrace();
-        Log.d("OrderApiService", "Could not create new stack for TLS v1.2");
+        Log.d("BeeBeeApiService", "Could not create new stack for TLS v1.2");
         stack = new HurlStack();
       }
       mQueue = Volley.newRequestQueue(ctx, stack);
@@ -78,13 +80,16 @@ public class OrderApiService {
       + "&lng=" + location.getLongitude(), null, success, error);
   }
 
-  private void JsonRequest(String url, Response.Listener<JSONObject> success, Response.ErrorListener error){
+  public void pong() {
+    JsonRequest(Request.Method.POST, mUserUrl + "/pong", null, null, null);
+  }
+
+  private void JsonRequest(String url, Response.Listener<JSONObject> success, Response.ErrorListener error) {
     this.JsonRequest(Request.Method.PUT, url, null, success, error);
   }
 
   private void JsonRequest(int method, String url, JSONObject requestObject, Response.Listener<JSONObject> successListener,
-                           final Response.ErrorListener errorListener){
-
+                           final Response.ErrorListener errorListener) {
     JsonObjectRequest jsObjRequest = new JsonObjectRequest
       (method, url, requestObject, successListener, new Response.ErrorListener() {
         @Override

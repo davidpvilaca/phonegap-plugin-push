@@ -48,7 +48,7 @@ public class MatchActivity extends Activity implements PushConstants {
   private static long DURATION = 30000;
   private CountDownTimer mCountDownTimer;
   private RejectedOrders mRejectedOrders = null;
-  private OrderApiService mOrderApiService = null;
+  private BeeBeeApiService mBeeBeeApiService = null;
   private FusedLocationProviderClient mFusedLocationClient = null;
   private ProgressDialog mProgressDialog = null;
   private AlertDialog mAlertDialog = null;
@@ -85,7 +85,7 @@ public class MatchActivity extends Activity implements PushConstants {
       SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(COM_ADOBE_PHONEGAP_PUSH, Context.MODE_PRIVATE);
       final String userToken = sharedPref.getString(USER_TOKEN, "");
       final String apiUrl = sharedPref.getString(API_URL, "");
-      mOrderApiService = new OrderApiService(this, orderId, userToken, apiUrl);
+      mBeeBeeApiService = new BeeBeeApiService(this, orderId, userToken, apiUrl);
 
       setButtonEvents(orderId, uid);
       setActivityValues(jsonOrder);
@@ -106,17 +106,17 @@ public class MatchActivity extends Activity implements PushConstants {
     slideButton.setSlideButtonListener(new SlideButton.SlideButtonListener() {
       @Override
       public void handleLeftSlide() {
-        reject(ctx, orderId, uid, mOrderApiService);
+        reject(ctx, orderId, uid, mBeeBeeApiService);
       }
 
       @Override
       public void handleRightSlide() {
-        accept(ctx, orderId, mOrderApiService);
+        accept(ctx, orderId, mBeeBeeApiService);
       }
     });
   }
 
-  private void accept(final Context ctx, final int orderId, OrderApiService orderApiService) {
+  private void accept(final Context ctx, final int orderId, BeeBeeApiService beeBeeApiService) {
     stopAlerts();
 
     mProgressDialog.setTitle("Aceitando Frete");
@@ -124,7 +124,7 @@ public class MatchActivity extends Activity implements PushConstants {
     mProgressDialog.setCancelable(false);
     mProgressDialog.show();
 
-    orderApiService.accept(
+    beeBeeApiService.accept(
       new Response.Listener<JSONObject>() {
         @Override
         public void onResponse(JSONObject response) {
@@ -229,12 +229,12 @@ public class MatchActivity extends Activity implements PushConstants {
       return null;
   }
 
-  private void reject(final Context ctx, final int orderId, final String uid, OrderApiService orderApiService) {
+  private void reject(final Context ctx, final int orderId, final String uid, BeeBeeApiService beeBeeApiService) {
     stopAlerts();
     mRejectedOrders.add(uid);
     Toast.makeText(ctx, "Pedido rejeitado", Toast.LENGTH_SHORT).show();
 
-    orderApiService.reject(
+    beeBeeApiService.reject(
       new Response.Listener<JSONObject>() {
         @Override
         public void onResponse(JSONObject response) {
