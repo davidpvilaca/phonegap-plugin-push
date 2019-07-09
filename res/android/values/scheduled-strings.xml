@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="scheduled_title_activity_fullscreen">Agendamento BeeBee</string>
+  <string name="scheduled_placeholder">Você tem um frete agendado para daqui a 40 MINUTOS (12:30h)</string>
+  <string name="scheduled_punctual">Seja pontual para garantir uma boa avaliação ;)</string>
+  <string name="scheduled_button_ok">Entendi</string>
+</resources>

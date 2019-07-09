@@ -39,6 +39,7 @@ import com.adobe.phonegap.push.location.PolyUtil;
 import com.adobe.phonegap.push.location.SphericalUtil;
 import com.adobe.phonegap.push.match.BeeBeeApiService;
 import com.adobe.phonegap.push.match.MatchActivity;
+import com.adobe.phonegap.push.scheduled.ScheduledActivity;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
@@ -197,6 +198,7 @@ public class FCMService extends FirebaseMessagingService implements PushConstant
       String messageKey = prefs.getString(MESSAGE_KEY, MESSAGE);
       String titleKey = prefs.getString(TITLE_KEY, TITLE);
       String isMatch = extras.getString(MATCH_NOTIFICATION);
+      String isScheduled = extras.getString(SCHEDULED_NOTIFICATION);
       String isPing = extras.getString(PING_NOTIFICATION);
       
       extras = normalizeExtras(applicationContext, extras, messageKey, titleKey);
@@ -208,6 +210,10 @@ public class FCMService extends FirebaseMessagingService implements PushConstant
       // if we are in a match notification, show match alarm activity
       if ("1".equals(isMatch)) {
         MatchActivity.startAlarm(this, extras);
+      }
+      // if we are in a scheduled start notification, show scheduled alarm activity
+      else if ("1".equals(isScheduled)) {
+        ScheduledActivity.startAlarm(this, extras);
       }
       // if we are in a ping notification, respond with a pong
       else if ("1".equals(isPing)) {

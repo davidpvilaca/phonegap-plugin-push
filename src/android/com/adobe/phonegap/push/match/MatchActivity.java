@@ -70,7 +70,7 @@ public class MatchActivity extends Activity implements PushConstants {
     mRejectedOrders = new RejectedOrders(this);
     mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-    mExtras = getIntent().getBundleExtra(MATCH_NOTIFICATION_EXTRAS);
+    mExtras = getIntent().getBundleExtra(NOTIFICATION_EXTRAS);
 
     try {
       JSONObject jsonOrder = new JSONObject(mExtras.getString(MATCH_ORDER_DETAILS));
@@ -389,7 +389,7 @@ public class MatchActivity extends Activity implements PushConstants {
 
   public static void startAlarm(Context context, Bundle extras) {
     Intent intent = new Intent(context, MatchActivity.class);
-    intent.putExtra(MATCH_NOTIFICATION_EXTRAS, extras);
+    intent.putExtra(NOTIFICATION_EXTRAS, extras);
     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
     context.startActivity(intent);

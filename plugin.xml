@@ -36,6 +36,16 @@
         android:noHistory="false"
         android:launchMode="singleInstance"
         android:taskAffinity="" />
+      <activity android:name="com.adobe.phonegap.push.scheduled.ScheduledActivity"
+        android:configChanges="orientation|keyboardHidden|screenSize"
+        android:label="@string/scheduled_title_activity_fullscreen"
+        android:theme="@style/FullscreenTheme"
+        android:immersive="true"
+        android:excludeFromRecents="true"
+        android:autoRemoveFromRecents="false"
+        android:noHistory="false"
+        android:launchMode="singleInstance"
+        android:taskAffinity="" />
       <receiver android:name="com.adobe.phonegap.push.BackgroundActionButtonHandler"/>
       <receiver android:name="com.adobe.phonegap.push.PushDismissedHandler"/>
       <service android:name="com.adobe.phonegap.push.FCMService">
@@ -74,6 +84,7 @@
     <source-file src="src/android/com/adobe/phonegap/push/match/BeeBeeApiService.java" target-dir="src/com/adobe/phonegap/push/match/"/>
     <source-file src="src/android/com/adobe/phonegap/push/match/RejectedOrders.java" target-dir="src/com/adobe/phonegap/push/match/"/>
     <source-file src="src/android/com/adobe/phonegap/push/match/SlideButton.java" target-dir="src/com/adobe/phonegap/push/match/"/>
+    <source-file src="src/android/com/adobe/phonegap/push/scheduled/ScheduledActivity.java" target-dir="src/com/adobe/phonegap/push/scheduled/"/>
     <source-file src="src/android/com/adobe/phonegap/push/PushConstants.java" target-dir="src/com/adobe/phonegap/push/"/>
     <source-file src="src/android/com/adobe/phonegap/push/PushHandlerActivity.java" target-dir="src/com/adobe/phonegap/push/"/>
     <source-file src="src/android/com/adobe/phonegap/push/PushInstanceIDListenerService.java" target-dir="src/com/adobe/phonegap/push/"/>
@@ -86,10 +97,12 @@
     <source-file src="res/android/drawable/slide_thumb.xml" target-dir="res/drawable/"/>
     <source-file src="res/android/drawable/yellow_badge.xml" target-dir="res/drawable/"/>
     <source-file src="res/android/layout/activity_match.xml" target-dir="res/layout/"/>
+    <source-file src="res/android/layout/activity_scheduled.xml" target-dir="res/layout/"/>
     <source-file src="res/android/values/match-attrs.xml" target-dir="res/values/"/>
     <source-file src="res/android/values/match-colors.xml" target-dir="res/values/"/>
     <source-file src="res/android/values/match-strings.xml" target-dir="res/values/"/>
     <source-file src="res/android/values/match-styles.xml" target-dir="res/values/"/>
+    <source-file src="res/android/values/scheduled-strings.xml" target-dir="res/values/"/>
     <source-file src="assets/android/fonts/icomoon.ttf" target-dir="assets/fonts/"/>
     
   </platform>

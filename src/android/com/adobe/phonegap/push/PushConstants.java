@@ -104,7 +104,10 @@ public interface PushConstants {
   public static final String CLEAR_NOTIFICATION = "clearNotification";
   public static final String MATCH_NOTIFICATION = "isMatch";
   public static final String MATCH_ORDER_DETAILS = "order";
-  public static final String MATCH_NOTIFICATION_EXTRAS = "NOTIFICATION_EXTRAS";
+  public static final String NOTIFICATION_EXTRAS = "NOTIFICATION_EXTRAS";
+  public static final String SCHEDULED_NOTIFICATION = "isScheduledStart";
+  public static final String SCHEDULED_TIME = "scheduledTime";
+  public static final String SCHEDULED_ALERTS = "alerts";
   public static final String LOCATION_AWARENESS = "locationAwareness";
   public static final String LOCATION_OBJECT = "locationObject";
   public static final String LOCATION_TYPE = "type";
