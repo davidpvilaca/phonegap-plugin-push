@@ -94,11 +94,13 @@ public class BeeBeeApiService {
       (method, url, requestObject, successListener, new Response.ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
-          String message = handleServerError(error);
-          if (message != null) {
-            errorListener.onErrorResponse(new VolleyError(message));
-          } else {
-            errorListener.onErrorResponse(error);
+          if (errorListener != null) {
+            String message = handleServerError(error);
+            if (message != null) {
+              errorListener.onErrorResponse(new VolleyError(message));
+            } else {
+              errorListener.onErrorResponse(error);
+            }
           }
         }
       })
