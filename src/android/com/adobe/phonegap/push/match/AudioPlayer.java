@@ -15,31 +15,37 @@ public class AudioPlayer {
   private static int lastVolume = -1;
 
   public static void stop(Context c) {
+    try {
+      if (lastVolume != -1) {
+        AudioManager audioManager = (AudioManager) c.getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, lastVolume, AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
+      }
 
-    if (lastVolume != -1) {
-      AudioManager audioManager = (AudioManager) c.getSystemService(Context.AUDIO_SERVICE);
-      audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, lastVolume, AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
-    }
-
-    if (mMediaPlayer != null) {
       mMediaPlayer.release();
       mMediaPlayer = null;
+    } catch (NullPointerException e) {
+      e.printStackTrace();
     }
   }
 
   public static void play(Context c) {
     stop(c);
 
-    AudioManager audioManager = (AudioManager)c.getSystemService(Context.AUDIO_SERVICE);
-    int maxVolumeMusic = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-    lastVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolumeMusic, AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
+    try {
+      AudioManager audioManager = (AudioManager)c.getSystemService(Context.AUDIO_SERVICE);
+      int maxVolumeMusic = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+      lastVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+      audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolumeMusic, AudioManager.FLAG_REMOVE_SOUND_AND_VIBRATE);
 
-    Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-//    mMediaPlayer = MediaPlayer.create(this, Meta.getResId(this, "raw", "gas"));
-    mMediaPlayer = MediaPlayer.create(c, notification);
-    mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-    mMediaPlayer.setLooping(true);
-    mMediaPlayer.start();
+      Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+  //    mMediaPlayer = MediaPlayer.create(this, Meta.getResId(this, "raw", "gas"));
+      mMediaPlayer = MediaPlayer.create(c, notification);
+      
+      mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+      mMediaPlayer.setLooping(true);
+      mMediaPlayer.start();
+    } catch (NullPointerException e) {
+      e.printStackTrace();
+    }
   }
 }

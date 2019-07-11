@@ -258,30 +258,39 @@ public class MatchActivity extends Activity implements PushConstants {
   }
 
   private void startAlerts() {
-    AudioPlayer.play(this);
+    try {
+      AudioPlayer.play(this);
 
-    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-    v.vibrate(new long[]{100L, 100L}, 0);
+      Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+      v.vibrate(new long[]{100L, 100L}, 0);
 
-    startCountdown();
+      startCountdown();
+    } catch (NullPointerException e) {
+      e.printStackTrace();
+    }
   }
 
   private void stopAlerts() {
-    if (mCountDownTimer != null) {
-      mCountDownTimer.cancel();
-    }
+    try {
+      if (mCountDownTimer != null) {
+        mCountDownTimer.cancel();
+      }
 
-    if (mProgressDialog != null) {
-      mProgressDialog.dismiss();
-    }
+      if (mProgressDialog != null) {
+        mProgressDialog.dismiss();
+      }
 
-    if (mAlertDialog != null) {
-      mAlertDialog.dismiss();
-    }
+      if (mAlertDialog != null) {
+        mAlertDialog.dismiss();
+      }
 
-    AudioPlayer.stop(this);
-    Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-    v.cancel();
+      AudioPlayer.stop(this);
+      
+      Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+      v.cancel();
+    } catch (NullPointerException e) {
+      e.printStackTrace();
+    }
   }
 
   private void startCountdown() {
