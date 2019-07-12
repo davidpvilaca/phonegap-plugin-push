@@ -58,5 +58,8 @@ public class IconMap {
     icons.put("icon-boss", "\ue933");
     icons.put("icon-wifi", "\ue934");
     icons.put("icon-sofa", "\ue935");
+    icons.put("icon-check", "\ue936");
+    icons.put("icon-bike", "\ue937");
+    icons.put("icon-car", "\ue938");
   }
 }
