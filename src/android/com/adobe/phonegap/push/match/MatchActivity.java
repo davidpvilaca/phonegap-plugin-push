@@ -36,6 +36,9 @@ import com.google.android.gms.location.LocationServices;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Random;
 
 import static android.support.v4.app.NotificationCompat.PRIORITY_MAX;
@@ -53,6 +56,8 @@ public class MatchActivity extends Activity implements PushConstants {
   private ProgressDialog mProgressDialog = null;
   private AlertDialog mAlertDialog = null;
   private Bundle mExtras = null;
+  private String mScheduleDate = null;
+  private boolean mIsScheduled = false;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +92,9 @@ public class MatchActivity extends Activity implements PushConstants {
       final String apiUrl = sharedPref.getString(API_URL, "");
       mBeeBeeApiService = new BeeBeeApiService(this, orderId, userToken, apiUrl);
 
+      mScheduleDate = jsonOrder.has("scheduleDate") ? jsonOrder.getString("scheduleDate") : null;
+      mIsScheduled = mScheduleDate != null && !mScheduleDate.isEmpty() && !mScheduleDate.equalsIgnoreCase("null");
+
       setButtonEvents(orderId, uid);
       setActivityValues(jsonOrder);
       setActivityScheduledIfNeeded(jsonOrder);
@@ -111,9 +119,59 @@ public class MatchActivity extends Activity implements PushConstants {
 
       @Override
       public void handleRightSlide() {
+        if (mIsScheduled) {
+          AlertDialog dialog = buildScheduledConfirmDialog(ctx, orderId, uid);
+          dialog.show();
+        } else {
+          accept(ctx, orderId, mBeeBeeApiService);
+        }
+      }
+    });
+  }
+
+  private AlertDialog buildScheduledConfirmDialog(final Context ctx, int orderId, String uid) {
+    SimpleDateFormat formatter = new SimpleDateFormat();
+    Date scheduleDate = null;
+    try {
+      formatter.applyPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // ISO8601
+      scheduleDate = formatter.parse(mScheduleDate);
+    }catch(ParseException e){}
+
+    formatter.applyPattern("dd/MM/yyyy");
+    String strDate = formatter.format(scheduleDate);
+    formatter.applyPattern("HH:mm");
+    String strTime = formatter.format(scheduleDate);
+
+    AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
+    builder.setTitle("Atenção: Frete Agendado");
+    builder.setMessage("Data: " + strDate + "\n\nHora de início: " + strTime);
+    builder.setPositiveButton("ACEITAR", new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int id) {
+        // User clicked OK button
         accept(ctx, orderId, mBeeBeeApiService);
       }
     });
+    builder.setNegativeButton("RECUSAR", new DialogInterface.OnClickListener() {
+      public void onClick(DialogInterface dialog, int id) {
+        // User cancelled the dialog
+        reject(ctx, orderId, uid, mBeeBeeApiService);
+      }
+    });
+
+    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+      public void onDismiss(DialogInterface dialog) {
+        // User dismissed
+        SlideButton slideButton = findViewById(Meta.getResId(ctx, "id", "slide_button"));
+        slideButton.resetProgress();
+      }
+    });
+    AlertDialog dialog = builder.create();
+
+    // Let's start with animation work. We just need to create a style and use it here as follow.
+    if (dialog.getWindow() != null)
+      dialog.getWindow().getAttributes().windowAnimations = android.R.style.Animation_Dialog;
+
+    return dialog;
   }
 
   private void accept(final Context ctx, final int orderId, BeeBeeApiService beeBeeApiService) {
@@ -285,7 +343,7 @@ public class MatchActivity extends Activity implements PushConstants {
       }
 
       AudioPlayer.stop(this);
-      
+
       Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
       v.cancel();
     } catch (NullPointerException e) {
@@ -354,10 +412,9 @@ public class MatchActivity extends Activity implements PushConstants {
   }
 
   private void setActivityScheduledIfNeeded(JSONObject jsonOrder) throws JSONException {
-    String scheduleDate = jsonOrder.has("scheduleDate") ? jsonOrder.getString("scheduleDate") : null;
     SlideButton slideButton = (SlideButton)findViewById(Meta.getResId(this, "id", "slide_button"));
 
-    if (scheduleDate != null && !scheduleDate.isEmpty() && !scheduleDate.equalsIgnoreCase("null")) {
+    if (mIsScheduled) {
       int colorScheduled = ResourcesCompat.getColor(getResources(),
         Meta.getResId(this, "color", "colorScheduled"), null);
       int blueBadgeId = Meta.getResId(this, "drawable", "blue_badge");
@@ -380,7 +437,7 @@ public class MatchActivity extends Activity implements PushConstants {
       layoutAccept.setBackgroundColor(colorScheduled);
 
       TextView scheduleDateTextView = findViewById(Meta.getResId(this, "id", "schedule_date"));
-      setItemValue("schedule_date", scheduleDate);
+      setItemValue("schedule_date", mScheduleDate);
       scheduleDateTextView.setVisibility(View.VISIBLE);
 
       slideButton.setBackgroundColor(colorScheduled);
