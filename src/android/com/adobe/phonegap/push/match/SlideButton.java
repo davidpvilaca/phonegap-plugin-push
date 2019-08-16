@@ -123,6 +123,10 @@ public class SlideButton extends android.support.v7.widget.AppCompatSeekBar {
     this.thumb = thumb;
   }
 
+  public void resetProgress() {
+    setProgress(INITIAL_VALUE);
+  }
+
   private void startAnimation() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       ((AnimatedVectorDrawable) thumb).start();
