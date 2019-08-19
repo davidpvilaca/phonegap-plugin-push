@@ -133,7 +133,7 @@ public class MatchActivity extends Activity implements PushConstants {
     SimpleDateFormat formatter = new SimpleDateFormat();
     Date scheduleDate = null;
     try {
-      formatter.applyPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"); // ISO8601
+      formatter.applyPattern("dd/MM/yyyy HH:mm");
       scheduleDate = formatter.parse(mScheduleDate);
     }catch(ParseException e){}
 
