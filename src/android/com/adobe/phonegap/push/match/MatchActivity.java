@@ -381,6 +381,7 @@ public class MatchActivity extends Activity implements PushConstants {
     setIconFont("icon_category", font);
 //    setIconFont("icon_freight_type", font);
 //    setIconFont("icon_route", font);
+    setItemValue("driver_comission", jsonOrder.getString("driverComission"));
 
     setItemValue("icon_category", IconMap.icons.get(jsonOrder.getString("categoryIcon")));
 //    setItemValue("icon_freight_type", IconMap.icons.get(jsonOrder.getString("freightTypeIcon")));
