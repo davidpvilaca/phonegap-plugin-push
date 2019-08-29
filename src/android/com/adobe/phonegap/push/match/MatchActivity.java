@@ -144,7 +144,7 @@ public class MatchActivity extends Activity implements PushConstants {
 
     AlertDialog.Builder builder = new AlertDialog.Builder(ctx);
     builder.setTitle("Atenção: Frete Agendado");
-    builder.setMessage("Data: " + strDate + "\n\nHora de início: " + strTime);
+    builder.setMessage(Html.fromHtml("<br/>Data: <b>" + strDate + "</b><br/><br/>Hora de início: <b>" + strTime + "</b>"));
     builder.setPositiveButton("ACEITAR", new DialogInterface.OnClickListener() {
       public void onClick(DialogInterface dialog, int id) {
         // User clicked OK button
