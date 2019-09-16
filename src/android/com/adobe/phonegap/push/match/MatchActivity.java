@@ -59,6 +59,13 @@ public class MatchActivity extends Activity implements PushConstants {
   private String mScheduleDate = null;
   private boolean mIsScheduled = false;
 
+  enum OrderType {
+    Unknown,
+    StaticRoute,
+    DynamicRoute,
+    ByHour
+  }
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -135,7 +142,8 @@ public class MatchActivity extends Activity implements PushConstants {
     try {
       formatter.applyPattern("dd/MM/yyyy HH:mm");
       scheduleDate = formatter.parse(mScheduleDate);
-    }catch(ParseException e){}
+    } catch (ParseException e) {
+    }
 
     formatter.applyPattern("dd/MM/yyyy");
     String strDate = formatter.format(scheduleDate);
@@ -410,10 +418,27 @@ public class MatchActivity extends Activity implements PushConstants {
       setItemValue("destination_address", firstObservations);
       layoutDestination.setVisibility(View.VISIBLE);
     }
+
+    final int orderTypeId = jsonOrder.getInt("orderTypeId");
+    TextView driverComissionText = findViewById(Meta.getResId(this, "id", "driver_comission_text"));
+    TextView route = findViewById(Meta.getResId(this, "id", "route"));
+    int colorPrimary = ResourcesCompat.getColor(getResources(),
+      Meta.getResId(this, "color", "colorPrimary"), null);
+    int colorRed = ResourcesCompat.getColor(getResources(),
+      Meta.getResId(this, "color", "red"), null);
+    if (orderTypeId == OrderType.DynamicRoute.ordinal()) {
+      setItemValue("driver_comission_text", "Valor mínimo");
+      driverComissionText.setTextColor(colorRed);
+      route.setTextColor(colorRed);
+    } else {
+      setItemValue("driver_comission_text", "Valor");
+      driverComissionText.setTextColor(colorPrimary);
+      route.setTextColor(colorPrimary);
+    }
   }
 
   private void setActivityScheduledIfNeeded(JSONObject jsonOrder) throws JSONException {
-    SlideButton slideButton = (SlideButton)findViewById(Meta.getResId(this, "id", "slide_button"));
+    SlideButton slideButton = (SlideButton) findViewById(Meta.getResId(this, "id", "slide_button"));
 
     if (mIsScheduled) {
       int colorScheduled = ResourcesCompat.getColor(getResources(),
