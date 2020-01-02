@@ -427,7 +427,7 @@ public class MatchActivity extends Activity implements PushConstants {
     int colorRed = ResourcesCompat.getColor(getResources(),
       Meta.getResId(this, "color", "red"), null);
     if (orderTypeId == OrderType.DynamicRoute.ordinal()) {
-      setItemValue("driver_comission_text", "Valor mínimo");
+      setItemValue("driver_comission_text", "Valor mínimo + KM");
       driverComissionText.setTextColor(colorRed);
       route.setTextColor(colorRed);
     } else {
