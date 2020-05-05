@@ -212,7 +212,7 @@ public class MatchActivity extends Activity implements PushConstants {
             }
           });
 
-          if (errorMsg != null && errorMsg != "") {
+          if (errorMsg != null && !errorMsg.isEmpty()) {
             builder.setMessage(errorMsg);
           } else {
             builder.setMessage("Não foi possível aceitar o pedido :(");
@@ -420,20 +420,38 @@ public class MatchActivity extends Activity implements PushConstants {
     }
 
     final int orderTypeId = jsonOrder.getInt("orderTypeId");
+    final String driverBonus = jsonOrder.getString("driverBonus");
+
     TextView driverComissionText = findViewById(Meta.getResId(this, "id", "driver_comission_text"));
+    TextView driverComissionBonusText = findViewById(Meta.getResId(this, "id", "driver_comission_bonus_text"));
     TextView route = findViewById(Meta.getResId(this, "id", "route"));
+
     int colorPrimary = ResourcesCompat.getColor(getResources(),
       Meta.getResId(this, "color", "colorPrimary"), null);
     int colorRed = ResourcesCompat.getColor(getResources(),
       Meta.getResId(this, "color", "red"), null);
+    int colorDriverBonus = ResourcesCompat.getColor(getResources(),
+      Meta.getResId(this, "color", "colorScheduled"), null);
+    boolean showDriverBonus = driverBonus != null && !driverBonus.isEmpty();
+
+    driverComissionBonusText.setVisibility(View.GONE);
+    driverComissionText.setVisibility(View.GONE);
+
+    if (showDriverBonus) {
+      setItemValue("driver_comission_bonus_text", driverBonus);
+      driverComissionBonusText.setVisibility(View.VISIBLE);
+    }
+
     if (orderTypeId == OrderType.DynamicRoute.ordinal()) {
       setItemValue("driver_comission_text", "Valor mínimo + KM");
       driverComissionText.setTextColor(colorRed);
       route.setTextColor(colorRed);
-    } else {
+      driverComissionText.setVisibility(View.VISIBLE);
+    } else if (driverBonus == null || driverBonus.isEmpty()) {
       setItemValue("driver_comission_text", "Valor");
       driverComissionText.setTextColor(colorPrimary);
       route.setTextColor(colorPrimary);
+      driverComissionText.setVisibility(View.VISIBLE);
     }
   }
 
