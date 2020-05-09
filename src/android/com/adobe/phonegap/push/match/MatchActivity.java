@@ -385,90 +385,73 @@ public class MatchActivity extends Activity implements PushConstants {
   }
 
   private void setActivityValues(JSONObject jsonOrder) throws JSONException {
+    SlideButton slideButton = findViewById(Meta.getResId(this, "id", "slide_button"));
+    int colorAccent = ResourcesCompat.getColor(getResources(),
+      Meta.getResId(this, "color", "colorAccent"), null);
+    slideButton.setBackgroundColor(colorAccent);
+
     Typeface font = Typeface.createFromAsset(getAssets(), "fonts/icomoon.ttf");
     setIconFont("icon_category", font);
-//    setIconFont("icon_freight_type", font);
-//    setIconFont("icon_route", font);
-    setItemValue("driver_comission", jsonOrder.getString("driverComission"));
+    setItemValue("driver_commission_text", jsonOrder.getString("driverComission"));
 
     setItemValue("icon_category", IconMap.icons.get(jsonOrder.getString("categoryIcon")));
-//    setItemValue("icon_freight_type", IconMap.icons.get(jsonOrder.getString("freightTypeIcon")));
-//    setItemValue("icon_route", IconMap.icons.get(jsonOrder.getString("routeIcon")));
-    setItemValue("category", jsonOrder.getString("category"));
-    setItemValue("freight_type", jsonOrder.getString("freightType"));
-    setItemValue("route", jsonOrder.getString("route"));
-    setItemValue("address", jsonOrder.getString("address"));
-
-    String locations = jsonOrder.getString("locations");
-    if (locations != null && !locations.isEmpty() && !locations.equalsIgnoreCase("null")) {
-      TextView locationsTextView = findViewById(Meta.getResId(this, "id", "locations"));
-      setItemValue("locations", locations);
-      locationsTextView.setVisibility(View.VISIBLE);
-    }
+    setItemValue("category_text", jsonOrder.getString("category"));
+    setItemValue("freight_type_text", jsonOrder.getString("freightType"));
+    setItemValue("order_route_summary_text", jsonOrder.getString("routeSummary"));
+    setItemValue("origin_text", jsonOrder.getString("address"));
 
     String destinationAddress = jsonOrder.getString("destinationAddress");
     String firstObservations = jsonOrder.getString("firstObservations");
     LinearLayout layoutDestination = findViewById(Meta.getResId(this, "id", "layout_destination"));
     if (destinationAddress != null && !destinationAddress.isEmpty() && !destinationAddress.equalsIgnoreCase("null")) {
       setItemValue("badge_destination", "Destino Final");
-      setItemValue("destination_address", destinationAddress);
+      setItemValue("destination_text", destinationAddress);
       layoutDestination.setVisibility(View.VISIBLE);
     } else if (firstObservations != null && !firstObservations.isEmpty() && !firstObservations.equalsIgnoreCase("null")) {
       setItemValue("badge_destination", "Instruções");
-      setItemValue("destination_address", firstObservations);
+      setItemValue("destination_text", firstObservations);
       layoutDestination.setVisibility(View.VISIBLE);
     }
 
     final int orderTypeId = jsonOrder.getInt("orderTypeId");
     final String driverBonus = jsonOrder.getString("driverBonus");
-
-    TextView driverComissionText = findViewById(Meta.getResId(this, "id", "driver_comission_text"));
-    TextView driverComissionBonusText = findViewById(Meta.getResId(this, "id", "driver_comission_bonus_text"));
-    TextView route = findViewById(Meta.getResId(this, "id", "route"));
-
-    int colorPrimary = ResourcesCompat.getColor(getResources(),
-      Meta.getResId(this, "color", "colorPrimary"), null);
-    int colorRed = ResourcesCompat.getColor(getResources(),
-      Meta.getResId(this, "color", "red"), null);
-    int colorDriverBonus = ResourcesCompat.getColor(getResources(),
-      Meta.getResId(this, "color", "colorScheduled"), null);
     boolean showDriverBonus = driverBonus != null && !driverBonus.isEmpty();
 
-    driverComissionBonusText.setVisibility(View.GONE);
-    driverComissionText.setVisibility(View.GONE);
+    TextView driverBonusText = findViewById(Meta.getResId(this, "id", "driver_bonus_text"));
+    TextView dynamicCostText = findViewById(Meta.getResId(this, "id", "dynamic_cost_text"));
+    TextView layoutGrayDivider = findViewById(Meta.getResId(this, "id", "layout_gray_divider"));
+    TextView initialValueText = findViewById(Meta.getResId(this, "id", "initial_value_text"));
+    LinearLayout layoutCostExtras = findViewById(Meta.getResId(this, "id", "layout_cost_extras"));
+
+    driverBonusText.setVisibility(View.GONE);
+    dynamicCostText.setVisibility(View.GONE);
+    layoutGrayDivider.setVisibility(View.GONE);
+    layoutCostExtras.setVisibility(View.GONE);
+    initialValueText.setVisibility(View.GONE);
+    setItemValue("order_type_text", "ROTA FIXA");
 
     if (showDriverBonus) {
-      setItemValue("driver_comission_bonus_text", driverBonus);
-      driverComissionBonusText.setVisibility(View.VISIBLE);
+      setItemValue("driver_bonus_text", driverBonus);
+      driverBonusText.setText(driverBonus);
+      driverBonusText.setVisibility(View.VISIBLE);
+      layoutGrayDivider.setVisibility(View.VISIBLE);
+      layoutCostExtras.setVisibility(View.VISIBLE);
     }
 
     if (orderTypeId == OrderType.DynamicRoute.ordinal()) {
-      setItemValue("driver_comission_text", "Valor mínimo + KM");
-      driverComissionText.setTextColor(colorRed);
-      route.setTextColor(colorRed);
-      driverComissionText.setVisibility(View.VISIBLE);
-    } else if (driverBonus == null || driverBonus.isEmpty()) {
-      setItemValue("driver_comission_text", "Valor");
-      driverComissionText.setTextColor(colorPrimary);
-      route.setTextColor(colorPrimary);
-      driverComissionText.setVisibility(View.VISIBLE);
+      setItemValue("order_type_text", "ROTA LIVRE");
+      dynamicCostText.setVisibility(View.VISIBLE);
+      initialValueText.setVisibility(View.VISIBLE);
+      layoutGrayDivider.setVisibility(View.VISIBLE);
+      layoutCostExtras.setVisibility(View.VISIBLE);
     }
   }
 
   private void setActivityScheduledIfNeeded(JSONObject jsonOrder) throws JSONException {
-    SlideButton slideButton = (SlideButton) findViewById(Meta.getResId(this, "id", "slide_button"));
-
     if (mIsScheduled) {
-      int colorScheduled = ResourcesCompat.getColor(getResources(),
-        Meta.getResId(this, "color", "colorScheduled"), null);
       int blueBadgeId = Meta.getResId(this, "drawable", "blue_badge");
 
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        ProgressBar pgBar = findViewById(Meta.getResId(this, "id", "progressBar"));
-        pgBar.getProgressDrawable().setTint(colorScheduled);
-      }
-
-      LinearLayout yellowLayout = findViewById(Meta.getResId(this, "id", "layout_yellow"));
+      LinearLayout yellowLayout = findViewById(Meta.getResId(this, "id", "layout_header"));
       yellowLayout.setBackgroundResource(blueBadgeId);
 
       TextView badgeOrigin = findViewById(Meta.getResId(this, "id", "badge_origin"));
@@ -477,18 +460,9 @@ public class MatchActivity extends Activity implements PushConstants {
       TextView badgeDestination = findViewById(Meta.getResId(this, "id", "badge_destination"));
       badgeDestination.setBackgroundResource(blueBadgeId);
 
-      LinearLayout layoutAccept = findViewById(Meta.getResId(this, "id", "layout_accept"));
-      layoutAccept.setBackgroundColor(colorScheduled);
-
-      TextView scheduleDateTextView = findViewById(Meta.getResId(this, "id", "schedule_date"));
-      setItemValue("schedule_date", mScheduleDate);
+      TextView scheduleDateTextView = findViewById(Meta.getResId(this, "id", "schedule_date_text"));
+      setItemValue("schedule_date_text", mScheduleDate);
       scheduleDateTextView.setVisibility(View.VISIBLE);
-
-      slideButton.setBackgroundColor(colorScheduled);
-    } else {
-      int colorAccent = ResourcesCompat.getColor(getResources(),
-        Meta.getResId(this, "color", "colorAccent"), null);
-      slideButton.setBackgroundColor(colorAccent);
     }
   }
 
