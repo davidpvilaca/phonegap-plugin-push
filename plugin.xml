@@ -94,6 +94,7 @@
     <source-file src="src/android/com/adobe/phonegap/push/PushDismissedHandler.java" target-dir="src/com/adobe/phonegap/push/"/>
 
     <source-file src="res/android/drawable/blue_badge.xml" target-dir="res/drawable/"/>
+    <source-file src="res/android/drawable/gray_badge.xml" target-dir="res/drawable/"/>
     <source-file src="res/android/drawable/slide_thumb_animated.xml" target-dir="res/drawable/"/>
     <source-file src="res/android/drawable/slide_thumb.xml" target-dir="res/drawable/"/>
     <source-file src="res/android/drawable/yellow_badge.xml" target-dir="res/drawable/"/>
