@@ -207,11 +207,11 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:textSize="12sp"
+        android:textSize="10sp"
         android:gravity="center"
         android:id="@+id/total_value_text"
         android:visibility="gone"
-        android:text="O valor total do frete será calculado no final da corrida."/>
+        android:text="ROTA LIVRE: O valor total do frete será calculado no final da corrida."/>
 
       <View
         android:layout_width="match_parent"
@@ -352,7 +352,7 @@
       android:layout_height="50dp"
       android:layout_alignParentBottom="true"
       android:layout_centerHorizontal="true"
-      android:layout_marginBottom="-2dp"
+      android:layout_marginBottom="-1dp"
       android:layout_marginStart="0dp"
       android:layout_marginTop="0dp"
       android:progressDrawable="@android:color/transparent"

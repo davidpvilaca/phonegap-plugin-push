@@ -421,6 +421,7 @@ public class MatchActivity extends Activity implements PushConstants {
     TextView dynamicCostText = findViewById(Meta.getResId(this, "id", "dynamic_cost_text"));
     TextView layoutGrayDivider = findViewById(Meta.getResId(this, "id", "layout_gray_divider"));
     TextView initialValueText = findViewById(Meta.getResId(this, "id", "initial_value_text"));
+    TextView totalValueText = findViewById(Meta.getResId(this, "id", "total_value_text"));
     LinearLayout layoutCostExtras = findViewById(Meta.getResId(this, "id", "layout_cost_extras"));
 
     driverBonusText.setVisibility(View.GONE);
@@ -428,6 +429,7 @@ public class MatchActivity extends Activity implements PushConstants {
     layoutGrayDivider.setVisibility(View.GONE);
     layoutCostExtras.setVisibility(View.GONE);
     initialValueText.setVisibility(View.GONE);
+    totalValueText.setVisibility(View.GONE);
     setItemValue("order_type_text", "ROTA FIXA");
 
     if (showDriverBonus) {
@@ -442,6 +444,7 @@ public class MatchActivity extends Activity implements PushConstants {
       setItemValue("order_type_text", "ROTA LIVRE");
       dynamicCostText.setVisibility(View.VISIBLE);
       initialValueText.setVisibility(View.VISIBLE);
+      totalValueText.setVisibility(View.VISIBLE);
       layoutGrayDivider.setVisibility(View.VISIBLE);
       layoutCostExtras.setVisibility(View.VISIBLE);
     }
