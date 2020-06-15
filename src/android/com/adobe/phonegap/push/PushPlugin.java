@@ -6,12 +6,14 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.media.AudioAttributes;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
@@ -299,6 +301,41 @@ public class PushPlugin extends CordovaPlugin implements PushConstants {
             callbackContext.error(e.getMessage());
           } catch (JSONException e) {
             callbackContext.error(e.getMessage());
+          }
+        }
+      });
+    } else if (HAS_PERMISSION_SYSTEM_ALERT.equals(action)) {
+      cordova.getThreadPool().execute(new Runnable() {
+        public void run() {
+          JSONObject jo = new JSONObject();
+          try {
+            boolean hasPerm;
+            if (Build.VERSION.SDK_INT < ANDROID_VERSION_MARSHMALLOW) {
+              hasPerm = true;
+            } else {
+              hasPerm = Settings.canDrawOverlays(getApplicationContext());
+            }
+            Log.d(LOG_TAG,
+              "has system alert permission: " + hasPerm);
+            jo.put("isEnabled", hasPerm);
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jo);
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
+          } catch (UnknownError e) {
+            callbackContext.error(e.getMessage());
+          } catch (JSONException e) {
+            callbackContext.error(e.getMessage());
+          }
+        }
+      });
+    } else if (REQUEST_PERMISSION_SYSTEM_ALERT.equals(action)) {
+      CordovaPlugin self = this;
+      cordova.getThreadPool().execute(new Runnable() {
+        public void run() {
+          if (Build.VERSION.SDK_INT >= ANDROID_VERSION_MARSHMALLOW) {
+            String packageName = getApplicationContext().getPackageName();
+            Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + packageName));
+            cordova.startActivityForResult(self, intent, REQUEST_SYSTEM_ALERT_WINDOW);
           }
         }
       });
