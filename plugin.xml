@@ -24,6 +24,7 @@
       <uses-permission android:name="android.permission.VIBRATE"/>
       <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
       <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+      <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     </config-file>
     <config-file target="AndroidManifest.xml" parent="/manifest/application">
       <activity android:name="com.adobe.phonegap.push.PushHandlerActivity" android:exported="true" android:permission="${applicationId}.permission.PushHandlerActivity"/>
@@ -71,7 +72,7 @@
     <framework src="com.google.android.gms:play-services-maps:$FCM_VERSION"/>
     <framework src="com.android.volley:volley:1.1.1"/>
     <framework src="com.android.support:design:$ANDROID_SUPPORT_V13_VERSION"/>
-    
+
     <source-file src="src/android/com/adobe/phonegap/push/FCMService.java" target-dir="src/com/adobe/phonegap/push/"/>
     <source-file src="src/android/com/adobe/phonegap/push/location/AppLocation.java" target-dir="src/com/adobe/phonegap/push/location/"/>
     <source-file src="src/android/com/adobe/phonegap/push/location/MathUtil.java" target-dir="src/com/adobe/phonegap/push/location/"/>
@@ -106,7 +107,7 @@
     <source-file src="res/android/values/match-styles.xml" target-dir="res/values/"/>
     <source-file src="res/android/values/scheduled-strings.xml" target-dir="res/values/"/>
     <source-file src="assets/android/fonts/icomoon.ttf" target-dir="assets/fonts/"/>
-    
+
   </platform>
   <platform name="browser">
     <js-module src="www/browser/push.js" name="BrowserPush">

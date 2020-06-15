@@ -370,6 +370,14 @@ module.exports = {
     exec(successCallback, errorCallback, 'PushNotification', 'hasPermission', []);
   },
 
+  hasPermissionSystemAlert: function hasPermissionSystemAlert(successCallback, errorCallback) {
+    exec(successCallback, errorCallback, 'PushNotification', 'hasPermissionSystemAlert', []);
+  },
+
+  requestPermissionSystemAlert: function requestPermissionSystemAlert(successCallback, errorCallback) {
+    exec(successCallback, errorCallback, 'PushNotification', 'requestPermissionSystemAlert', []);
+  },
+
   createChannel: function createChannel(successCallback, errorCallback, channel) {
     exec(successCallback, errorCallback, 'PushNotification', 'createChannel', [channel]);
   },
