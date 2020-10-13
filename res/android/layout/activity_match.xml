@@ -151,7 +151,7 @@
           android:textStyle="bold"
           android:textSize="14sp"
           android:visibility="gone"
-          android:text="VALOR INICIAL"/>
+          android:text="VALOR MÍNIMO"/>
         <TextView
           android:id="@+id/driver_commission_text"
           android:layout_width="wrap_content"
@@ -185,7 +185,7 @@
           android:layout_gravity="center_vertical"
           android:textStyle="bold"
           android:textSize="14sp"
-          android:text="+ KM PERCORRIDO"/>
+          android:text="+ KM EXCEDENTE AO MÍNIMO"/>
         <TextView
           android:id="@+id/driver_bonus_text"
           android:layout_marginVertical="5dp"
