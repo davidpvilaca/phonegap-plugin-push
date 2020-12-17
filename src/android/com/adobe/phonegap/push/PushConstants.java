@@ -119,6 +119,7 @@ public interface PushConstants {
   public static final String LOCATION_RADIUS = "radius";
   public static final String PING_NOTIFICATION = "isPing";
   public static final String USER_TOKEN = "userToken";
+  public static final String USER_ID = "userId";
   public static final String API_URL = "apiUrl";
   public static final String HAS_PERMISSION_SYSTEM_ALERT = "hasPermissionSystemAlert";
   public static final String REQUEST_PERMISSION_SYSTEM_ALERT = "requestPermissionSystemAlert";
