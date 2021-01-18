@@ -134,35 +134,64 @@
       android:background="@drawable/gray_badge"
       android:paddingHorizontal="10dp"
       android:orientation="horizontal">
+
       <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.5"
-        android:layout_marginRight="10dp"
-        android:layout_marginVertical="@dimen/default_spacing"
-        android:gravity="center"
+        android:id="@+id/favorite_driver_layout"
+        android:layout_width="45dp"
+        android:layout_height="85dp"
         android:layout_gravity="center"
+        android:layout_marginVertical="@dimen/default_spacing"
+        android:layout_marginRight="0dp"
+        android:layout_weight="0.1"
+        android:gravity="center"
         android:orientation="vertical">
+        <ImageView
+          android:layout_width="40dp"
+          android:layout_height="40dp"
+          android:src="@drawable/ic_round_star_24"/>
+        <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center_horizontal"
+          android:layout_marginTop="0dp"
+          android:text="Motorista Favorito"
+          android:textAlignment="center"
+          android:textColor="@color/colorPrimary"
+          android:textSize="13sp" />
+      </LinearLayout>
+
+      <LinearLayout
+        android:layout_width="93dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginVertical="@dimen/default_spacing"
+        android:layout_marginRight="10dp"
+        android:layout_weight="0.5"
+        android:gravity="center"
+        android:orientation="vertical">
+
         <TextView
           android:id="@+id/initial_value_text"
-          android:layout_width="match_parent"
+          android:layout_width="wrap_content"
           android:layout_height="wrap_content"
+          android:text="VALOR MÍNIMO"
           android:textColor="@color/darkGray"
-          android:textStyle="bold"
           android:textSize="14sp"
-          android:visibility="gone"
-          android:text="VALOR MÍNIMO"/>
+          android:textStyle="bold"
+          android:layout_gravity="center"
+          android:visibility="gone" />
+
         <TextView
           android:id="@+id/driver_commission_text"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:textStyle="bold"
+          android:text="R$2000,78"
           android:textSize="28sp"
-          android:text="R$2000,78"/>
+          android:textStyle="bold" />
       </LinearLayout>
       <TextView
         android:id="@+id/layout_gray_divider"
-        android:layout_marginTop="-10dp"
+        android:layout_marginTop="0dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="80sp"
@@ -184,7 +213,7 @@
           android:layout_height="wrap_content"
           android:layout_gravity="center_vertical"
           android:textStyle="bold"
-          android:textSize="14sp"
+          android:textSize="12sp"
           android:text="+ KM EXCEDENTE AO MÍNIMO"/>
         <TextView
           android:id="@+id/driver_bonus_text"
@@ -193,7 +222,7 @@
           android:layout_height="wrap_content"
           android:layout_gravity="center_vertical"
           android:textStyle="bold"
-          android:textSize="14sp"
+          android:textSize="12sp"
           android:text="+ R$10,00 (BÔNUS)"/>
       </LinearLayout>
     </LinearLayout>

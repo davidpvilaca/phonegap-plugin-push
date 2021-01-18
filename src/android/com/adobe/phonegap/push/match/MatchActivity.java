@@ -25,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.util.Log;
 
 import com.adobe.phonegap.push.PushConstants;
 import com.adobe.phonegap.push.PushHandlerActivity;
@@ -33,6 +34,7 @@ import com.android.volley.VolleyError;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -49,6 +51,7 @@ import static android.support.v4.app.NotificationCompat.PRIORITY_MAX;
 
 public class MatchActivity extends Activity implements PushConstants {
   private static long DURATION = 30000;
+  public static final String LOG_TAG = "Push_Plugin";
   private CountDownTimer mCountDownTimer;
   private RejectedOrders mRejectedOrders = null;
   private BeeBeeApiService mBeeBeeApiService = null;
@@ -96,6 +99,7 @@ public class MatchActivity extends Activity implements PushConstants {
 
       SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(COM_ADOBE_PHONEGAP_PUSH, Context.MODE_PRIVATE);
       final String userToken = sharedPref.getString(USER_TOKEN, "");
+      final int driverId = sharedPref.getInt(USER_ID, 0);
       final String apiUrl = sharedPref.getString(API_URL, "");
       mBeeBeeApiService = new BeeBeeApiService(this, orderId, userToken, apiUrl);
 
@@ -103,7 +107,7 @@ public class MatchActivity extends Activity implements PushConstants {
       mIsScheduled = mScheduleDate != null && !mScheduleDate.isEmpty() && !mScheduleDate.equalsIgnoreCase("null");
 
       setButtonEvents(orderId, uid);
-      setActivityValues(jsonOrder);
+      setActivityValues(jsonOrder, driverId);
       setActivityScheduledIfNeeded(jsonOrder);
 
     } catch (JSONException e) {
@@ -384,7 +388,7 @@ public class MatchActivity extends Activity implements PushConstants {
     view.setTypeface(font);
   }
 
-  private void setActivityValues(JSONObject jsonOrder) throws JSONException {
+  private void setActivityValues(JSONObject jsonOrder, int driverId) throws JSONException {
     SlideButton slideButton = findViewById(Meta.getResId(this, "id", "slide_button"));
     int colorAccent = ResourcesCompat.getColor(getResources(),
       Meta.getResId(this, "color", "colorAccent"), null);
@@ -399,6 +403,7 @@ public class MatchActivity extends Activity implements PushConstants {
     setItemValue("freight_type_text", jsonOrder.getString("freightType"));
     setItemValue("order_route_summary_text", jsonOrder.getString("routeSummary"));
     setItemValue("origin_text", jsonOrder.getString("address"));
+
 
     String destinationAddress = jsonOrder.getString("destinationAddress");
     String firstObservations = jsonOrder.getString("firstObservations");
@@ -423,6 +428,7 @@ public class MatchActivity extends Activity implements PushConstants {
     TextView initialValueText = findViewById(Meta.getResId(this, "id", "initial_value_text"));
     TextView totalValueText = findViewById(Meta.getResId(this, "id", "total_value_text"));
     LinearLayout layoutCostExtras = findViewById(Meta.getResId(this, "id", "layout_cost_extras"));
+    LinearLayout favoriteDriverLayout = findViewById(Meta.getResId(this, "id", "favorite_driver_layout"));
 
     driverBonusText.setVisibility(View.GONE);
     dynamicCostText.setVisibility(View.GONE);
@@ -430,7 +436,35 @@ public class MatchActivity extends Activity implements PushConstants {
     layoutCostExtras.setVisibility(View.GONE);
     initialValueText.setVisibility(View.GONE);
     totalValueText.setVisibility(View.GONE);
+    favoriteDriverLayout.setVisibility(View.GONE);
     setItemValue("order_type_text", "ROTA FIXA");
+
+    try {
+      JSONArray favoriteDriversFromCompany = jsonOrder.getJSONArray("requesterCompanyFavoriteDrivers");
+      boolean isFavoriteDriver = false;
+
+      Log.d(LOG_TAG, "Iniciando verificação de driver favorito");
+
+      Log.d(LOG_TAG, "DRIVER LOGADO: " + driverId);
+
+      for (int i = 0; i < favoriteDriversFromCompany.length(); i++) {
+        int id = favoriteDriversFromCompany.getJSONObject(i).getInt("id");
+        Log.d(LOG_TAG, "Comparando com id: " + id);
+        if (id == driverId) {
+          isFavoriteDriver = true;
+          break;
+        }
+      }
+
+      Log.d(LOG_TAG, "------------ IS FAVORITE DRIVER: " + isFavoriteDriver + " ----------------");
+
+      if (isFavoriteDriver) {
+        favoriteDriverLayout.setVisibility(View.VISIBLE);
+      }
+    } catch (JSONException e) {
+      Log.d(LOG_TAG, "------------ IS FAVORITE DRIVER: error on get ----------------");
+      Log.d(LOG_TAG, jsonOrder.toString());
+    }
 
     if (showDriverBonus) {
       setItemValue("driver_bonus_text", driverBonus);
