@@ -33,7 +33,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginHorizontal="@dimen/default_spacing"
-      android:layout_marginTop="5dp"
+      android:layout_marginTop="10dp"
       android:background="@drawable/yellow_badge"
       android:gravity="center"
       android:orientation="horizontal"
@@ -384,7 +384,9 @@
       android:layout_below="@id/layout_divider"
       android:layout_marginLeft="@dimen/default_spacing"
       android:layout_marginRight="@dimen/default_spacing"
-      android:minHeight="180dp"
+      android:adjustViewBounds="true"
+      android:maxHeight="200dp"
+      android:minHeight="200dp"
       tools:src="@tools:sample/avatars" />
 
   </RelativeLayout>

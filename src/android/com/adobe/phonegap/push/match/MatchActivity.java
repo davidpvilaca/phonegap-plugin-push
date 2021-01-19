@@ -10,8 +10,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
@@ -40,8 +38,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -423,7 +419,7 @@ public class MatchActivity extends Activity implements PushConstants {
     final String driverBonus = jsonOrder.getString("driverBonus");
     boolean showDriverBonus = driverBonus != null && !driverBonus.isEmpty();
 
-    String mapImageUrl = jsonOrder.has("mapUrl") ? jsonOrder.getString("mapUrl") : null;
+    String staticMapUrl = jsonOrder.getString("staticMapUrl");
 
     TextView driverBonusText = findViewById(Meta.getResId(this, "id", "driver_bonus_text"));
     TextView dynamicCostText = findViewById(Meta.getResId(this, "id", "dynamic_cost_text"));
@@ -459,11 +455,10 @@ public class MatchActivity extends Activity implements PushConstants {
       layoutCostExtras.setVisibility(View.VISIBLE);
     }
 
-    if (mapImageUrl != null) {
-      URL url = new URL(mapImageUrl);
-      Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+    if (!staticMapUrl.equals("null")) {
       mapPreview.setVisibility(View.VISIBLE);
-      mapPreview.setImageBitmap(bmp);
+      String url = "https://beebee-assets-dev.s3.sa-east-1.amazonaws.com/static-maps/2021/1/19/order-4743-w640-h320-z18.png?AWSAccessKeyId=AKIAU2SRV6S2LH4XT74Z&Expires=1611082630&Signature=1n6fIYerasp3qcdCs850Jhh652I%3D&response-content-type=image%2Fpng";
+      new BeeBeeImageLoader(mapPreview).execute(url);
     }
   }
 
@@ -489,10 +484,6 @@ public class MatchActivity extends Activity implements PushConstants {
   private void setItemValue(String id, String value) {
     TextView view = findViewById(Meta.getResId(this, "id", id));
     view.setText(value);
-  }
-
-  private void setMapImage(String id, String value) {
-
   }
 
   public static void startAlarm(Context context, Bundle extras) {
