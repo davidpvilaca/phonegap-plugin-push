@@ -386,7 +386,7 @@ public class MatchActivity extends Activity implements PushConstants {
     view.setTypeface(font);
   }
 
-  private void setActivityValues(JSONObject jsonOrder) throws JSONException, IOException {
+  private void setActivityValues(JSONObject jsonOrder) throws JSONException {
     SlideButton slideButton = findViewById(Meta.getResId(this, "id", "slide_button"));
     int colorAccent = ResourcesCompat.getColor(getResources(),
       Meta.getResId(this, "color", "colorAccent"), null);
@@ -457,8 +457,7 @@ public class MatchActivity extends Activity implements PushConstants {
 
     if (!staticMapUrl.equals("null")) {
       mapPreview.setVisibility(View.VISIBLE);
-      String url = "https://beebee-assets-dev.s3.sa-east-1.amazonaws.com/static-maps/2021/1/19/order-4743-w640-h320-z18.png?AWSAccessKeyId=AKIAU2SRV6S2LH4XT74Z&Expires=1611082630&Signature=1n6fIYerasp3qcdCs850Jhh652I%3D&response-content-type=image%2Fpng";
-      new BeeBeeImageLoader(mapPreview).execute(url);
+      new BeeBeeImageLoader(mapPreview).execute(staticMapUrl);
     }
   }
 
