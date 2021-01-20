@@ -108,7 +108,7 @@ public class MatchActivity extends Activity implements PushConstants {
       setActivityValues(jsonOrder);
       setActivityScheduledIfNeeded(jsonOrder);
 
-    } catch (JSONException | IOException e) {
+    } catch (JSONException e) {
       e.printStackTrace();
     }
 
