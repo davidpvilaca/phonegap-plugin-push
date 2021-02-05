@@ -28,12 +28,12 @@
     android:background="#FFF"
     android:orientation="horizontal">
 
-    <LinearLayout
+    <RelativeLayout
       android:id="@+id/layout_header"
-      android:layout_width="match_parent"
+      android:layout_width="fill_parent"
       android:layout_height="wrap_content"
       android:layout_marginHorizontal="@dimen/default_spacing"
-      android:layout_marginTop="10dp"
+      android:layout_marginTop="@dimen/default_spacing"
       android:background="@drawable/yellow_badge"
       android:gravity="center"
       android:orientation="horizontal"
@@ -42,35 +42,34 @@
       <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="vertical">
+        android:layout_gravity="start"
+        android:orientation="horizontal">
 
         <TextView
           android:id="@+id/icon_category"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_gravity="center_horizontal"
-          android:layout_marginTop="-10dp"
           android:text="C"
-          android:textSize="50sp" />
+          android:textSize="30sp" />
 
         <TextView
           android:id="@+id/category_text"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_gravity="center"
-          android:layout_marginTop="-10dp"
-          android:maxWidth="150dp"
-          android:text="CARGO"
-          android:textAlignment="center"
-          android:textSize="16sp"
+          android:layout_marginLeft="5dp"
+          android:text="Carro X"
+          android:textSize="15sp"
           android:textStyle="bold" />
+
       </LinearLayout>
 
       <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:gravity="right"
+        android:layout_alignParentRight="true"
+        android:gravity="center"
         android:orientation="vertical">
 
         <TextView
@@ -78,8 +77,8 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:text="Imediato"
-          android:textAlignment="textEnd"
-          android:textSize="30sp"
+          android:layout_gravity="right"
+          android:textSize="18sp"
           android:textStyle="bold" />
 
         <TextView
@@ -88,11 +87,11 @@
           android:layout_height="wrap_content"
           android:text="20/05/2020 18:00"
           android:textAlignment="textEnd"
-          android:textSize="18sp"
+          android:textSize="15sp"
           android:textStyle="bold"
           android:visibility="gone" />
       </LinearLayout>
-    </LinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
       android:id="@+id/layout_gray"
@@ -109,8 +108,8 @@
 
       <LinearLayout
         android:id="@+id/favorite_driver_layout"
-        android:layout_width="45dp"
-        android:layout_height="85dp"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginVertical="@dimen/default_spacing"
         android:layout_marginRight="0dp"
@@ -118,8 +117,8 @@
         android:gravity="center"
         android:orientation="vertical">
         <ImageView
-          android:layout_width="40dp"
-          android:layout_height="40dp"
+          android:layout_width="35dp"
+          android:layout_height="35dp"
           android:src="@drawable/ic_round_star_24"/>
         <TextView
           android:layout_width="wrap_content"
@@ -129,11 +128,11 @@
           android:text="Motorista Favorito"
           android:textAlignment="center"
           android:textColor="@color/colorPrimary"
-          android:textSize="13sp" />
+          android:textSize="12sp" />
       </LinearLayout>
 
       <LinearLayout
-        android:layout_width="93dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginVertical="@dimen/default_spacing"
@@ -150,7 +149,7 @@
           android:textColor="@color/darkGray"
           android:textSize="14sp"
           android:textStyle="bold"
-          android:layout_gravity="center"
+          android:layout_gravity="right"
           android:visibility="gone" />
 
         <TextView
@@ -159,6 +158,7 @@
           android:layout_height="wrap_content"
           android:text="R$2000,78"
           android:textSize="28sp"
+          android:layout_gravity="right"
           android:textStyle="bold" />
       </LinearLayout>
       <TextView
@@ -172,7 +172,7 @@
         android:text="{"/>
       <LinearLayout
         android:id="@+id/layout_cost_extras"
-        android:layout_width="0dp"
+        android:layout_width="40dp"
         android:layout_height="wrap_content"
         android:layout_weight="0.5"
         android:layout_marginLeft="10dp"
@@ -235,10 +235,11 @@
 
     <LinearLayout
       android:id="@+id/layout_divider"
-      android:layout_width="match_parent"
+      android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_below="@id/layout_pre_map"
       android:layout_marginTop="0dp"
+      android:gravity="center"
       android:orientation="vertical">
 
       <TextView
@@ -401,14 +402,13 @@
 
     <ImageView
       android:id="@+id/map_preview"
-      android:layout_width="match_parent"
+      android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_below="@id/layout_divider"
       android:layout_marginLeft="@dimen/default_spacing"
       android:layout_marginRight="@dimen/default_spacing"
       android:adjustViewBounds="true"
-      android:maxHeight="200dp"
-      android:minHeight="200dp"
+      android:layout_centerHorizontal="true"
       tools:src="@tools:sample/avatars" />
 
   </RelativeLayout>
