@@ -24,6 +24,7 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.util.Log;
@@ -497,7 +498,7 @@ public class MatchActivity extends Activity implements PushConstants {
     if (mIsScheduled) {
       int blueBadgeId = Meta.getResId(this, "drawable", "blue_badge");
 
-      LinearLayout yellowLayout = findViewById(Meta.getResId(this, "id", "layout_header"));
+      RelativeLayout yellowLayout = findViewById(Meta.getResId(this, "id", "layout_header"));
       yellowLayout.setBackgroundResource(blueBadgeId);
 
       TextView badgeOrigin = findViewById(Meta.getResId(this, "id", "badge_origin"));
