@@ -42,7 +42,7 @@
       <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="start"
+        android:layout_gravity="center"
         android:orientation="horizontal">
 
         <TextView
@@ -66,7 +66,7 @@
       </LinearLayout>
 
       <LinearLayout
-        android:layout_width="100dp"
+        android:layout_width="130dp"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:gravity="center"
@@ -77,8 +77,9 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:text="Imediato"
+          android:textAllCaps="true"
           android:layout_gravity="right"
-          android:textSize="18sp"
+          android:textSize="15sp"
           android:textStyle="bold" />
 
         <TextView
@@ -87,38 +88,35 @@
           android:layout_height="wrap_content"
           android:text="20/05/2020 18:00"
           android:textAlignment="textEnd"
-          android:textSize="15sp"
+          android:textSize="20sp"
           android:textStyle="bold"
-          android:visibility="gone" />
+          android:visibility="gone"/>
       </LinearLayout>
     </RelativeLayout>
 
     <LinearLayout
       android:id="@+id/layout_gray"
       android:layout_width="match_parent"
-      android:layout_height="wrap_content"
+      android:layout_height="75dp"
       android:layout_below="@id/layout_header"
       android:layout_centerHorizontal="true"
       android:layout_marginLeft="@dimen/default_spacing"
       android:layout_marginRight="@dimen/default_spacing"
       android:layout_marginTop="@dimen/default_spacing"
       android:background="@drawable/gray_badge"
-      android:paddingHorizontal="10dp"
+      android:paddingHorizontal="5dp"
       android:orientation="horizontal">
 
       <LinearLayout
         android:id="@+id/favorite_driver_layout"
-        android:layout_width="50dp"
-        android:layout_height="wrap_content"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_gravity="center"
-        android:layout_marginVertical="@dimen/default_spacing"
-        android:layout_marginRight="0dp"
-        android:layout_weight="0.1"
         android:gravity="center"
         android:orientation="vertical">
         <ImageView
-          android:layout_width="35dp"
-          android:layout_height="35dp"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
           android:src="@drawable/ic_round_star_24"/>
         <TextView
           android:layout_width="wrap_content"
@@ -128,7 +126,7 @@
           android:text="Motorista Favorito"
           android:textAlignment="center"
           android:textColor="@color/colorPrimary"
-          android:textSize="12sp" />
+          android:textSize="10sp" />
       </LinearLayout>
 
       <LinearLayout
@@ -137,7 +135,7 @@
         android:layout_gravity="center"
         android:layout_marginVertical="@dimen/default_spacing"
         android:layout_marginRight="10dp"
-        android:layout_weight="0.5"
+        android:layout_weight="0.08"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -147,7 +145,7 @@
           android:layout_height="wrap_content"
           android:text="VALOR MÍNIMO"
           android:textColor="@color/darkGray"
-          android:textSize="14sp"
+          android:textSize="13sp"
           android:textStyle="bold"
           android:layout_gravity="right"
           android:visibility="gone" />
@@ -157,18 +155,16 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:text="R$2000,78"
-          android:textSize="28sp"
+          android:textSize="22sp"
           android:layout_gravity="right"
           android:textStyle="bold" />
       </LinearLayout>
       <TextView
         android:id="@+id/layout_gray_divider"
-        android:layout_marginTop="0dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="80sp"
+        android:textSize="50sp"
         android:textColor="@color/gray"
-        android:paddingBottom="5dp"
         android:text="{"/>
       <LinearLayout
         android:id="@+id/layout_cost_extras"
@@ -238,8 +234,8 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_below="@id/layout_pre_map"
-      android:layout_marginTop="0dp"
-      android:gravity="center"
+      android:layout_marginHorizontal="@dimen/default_spacing"
+      android:layout_marginTop="2dp"
       android:orientation="vertical">
 
       <TextView
@@ -247,15 +243,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
-        android:gravity="center"
+        android:gravity="start"
         android:text="ROTA LIVRE: O valor total do frete será calculado no final da corrida."
         android:textSize="10sp"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
       <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_margin="@dimen/default_spacing"
+        android:layout_marginTop="5dp"
         android:background="@color/gray"></View>
 
     </LinearLayout>
@@ -291,6 +287,7 @@
         android:layout_gravity="center_vertical"
         android:layout_marginTop="5dp"
         android:text="R. Constante Sodré, 476 - Santa Lúcia, Vitória - ES, 29056-310, Brasil"
+        android:padding="5dp"
         android:textSize="15sp" />
 
     </LinearLayout>
@@ -333,6 +330,7 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:text="R. Constante Sodré, 476 - Santa Lúcia, Vitória - ES, 29056-310, Brasil"
+          android:padding="5dp"
           android:textSize="15sp" />
 
       </ScrollView>
