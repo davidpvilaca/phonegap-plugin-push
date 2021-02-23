@@ -31,18 +31,19 @@
     <RelativeLayout
       android:id="@+id/layout_header"
       android:layout_width="fill_parent"
-      android:layout_height="wrap_content"
+      android:layout_height="40dp"
       android:layout_marginHorizontal="@dimen/default_spacing"
       android:layout_marginTop="@dimen/default_spacing"
       android:background="@drawable/yellow_badge"
       android:gravity="center"
       android:orientation="horizontal"
-      android:padding="@dimen/default_spacing">
+      android:padding="3dp">
 
       <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginLeft="5dp"
         android:orientation="horizontal">
 
         <TextView
@@ -69,6 +70,8 @@
         android:layout_width="130dp"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
+        android:layout_marginTop="5dp"
+        android:layout_marginRight="5dp"
         android:gravity="center"
         android:orientation="vertical">
 
@@ -76,9 +79,9 @@
           android:id="@+id/freight_type_text"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
+          android:layout_gravity="right"
           android:text="Imediato"
           android:textAllCaps="true"
-          android:layout_gravity="right"
           android:textSize="15sp"
           android:textStyle="bold" />
 
@@ -90,34 +93,36 @@
           android:textAlignment="textEnd"
           android:textSize="20sp"
           android:textStyle="bold"
-          android:visibility="gone"/>
+          android:visibility="gone" />
       </LinearLayout>
     </RelativeLayout>
 
     <LinearLayout
       android:id="@+id/layout_gray"
       android:layout_width="match_parent"
-      android:layout_height="75dp"
+      android:layout_height="60dp"
       android:layout_below="@id/layout_header"
       android:layout_centerHorizontal="true"
       android:layout_marginLeft="@dimen/default_spacing"
-      android:layout_marginRight="@dimen/default_spacing"
       android:layout_marginTop="@dimen/default_spacing"
+      android:layout_marginRight="@dimen/default_spacing"
       android:background="@drawable/gray_badge"
-      android:paddingHorizontal="5dp"
-      android:orientation="horizontal">
+      android:orientation="horizontal"
+      android:paddingHorizontal="5dp">
 
       <LinearLayout
         android:id="@+id/favorite_driver_layout"
         android:layout_width="60dp"
-        android:layout_height="60dp"
+        android:layout_height="50dp"
         android:layout_gravity="center"
         android:gravity="center"
         android:orientation="vertical">
+
         <ImageView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:src="@drawable/ic_round_star_24"/>
+          android:src="@drawable/ic_round_star_24" />
+
         <TextView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
@@ -143,55 +148,59 @@
           android:id="@+id/initial_value_text"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
+          android:layout_gravity="right"
           android:text="VALOR MÍNIMO"
           android:textColor="@color/darkGray"
           android:textSize="13sp"
           android:textStyle="bold"
-          android:layout_gravity="right"
           android:visibility="gone" />
 
         <TextView
           android:id="@+id/driver_commission_text"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
+          android:layout_gravity="right"
           android:text="R$2000,78"
           android:textSize="22sp"
-          android:layout_gravity="right"
           android:textStyle="bold" />
       </LinearLayout>
+
       <TextView
         android:id="@+id/layout_gray_divider"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="50sp"
+        android:text="{"
         android:textColor="@color/gray"
-        android:text="{"/>
+        android:textSize="40sp" />
+
       <LinearLayout
         android:id="@+id/layout_cost_extras"
         android:layout_width="40dp"
         android:layout_height="wrap_content"
-        android:layout_weight="0.5"
-        android:layout_marginLeft="10dp"
         android:layout_gravity="center_vertical"
+        android:layout_marginLeft="10dp"
+        android:layout_weight="0.5"
         android:orientation="vertical">
+
         <TextView
           android:id="@+id/dynamic_cost_text"
-          android:layout_marginVertical="0dp"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_gravity="center_vertical"
-          android:textStyle="bold"
+          android:layout_marginVertical="0dp"
+          android:text="+ KM EXCEDENTE AO MÍNIMO"
           android:textSize="12sp"
-          android:text="+ KM EXCEDENTE AO MÍNIMO"/>
+          android:textStyle="bold" />
+
         <TextView
           android:id="@+id/driver_bonus_text"
-          android:layout_marginVertical="0dp"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_gravity="center_vertical"
-          android:textStyle="bold"
+          android:layout_marginVertical="0dp"
+          android:text="+ R$10,00 (BÔNUS)"
           android:textSize="12sp"
-          android:text="+ R$10,00 (BÔNUS)"/>
+          android:textStyle="bold" />
       </LinearLayout>
     </LinearLayout>
 
