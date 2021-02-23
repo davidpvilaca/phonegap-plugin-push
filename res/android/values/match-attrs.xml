@@ -10,6 +10,5 @@
   </declare-styleable>
 
   <dimen name="default_spacing">10dp</dimen>
-  <dimen name="default_horizontal_spacing">15dp</dimen>
 
 </resources>
