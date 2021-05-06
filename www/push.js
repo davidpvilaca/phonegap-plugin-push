@@ -372,6 +372,14 @@ module.exports = {
     exec(successCallback, errorCallback, 'PushNotification', 'requestPermissionSystemAlert', []);
   },
 
+  hasPermissionMiUI: function hasPermissionMiUI(successCallback, errorCallback) {
+    exec(successCallback, errorCallback, 'PushNotification', 'hasPermissionMiUI', []);
+  },
+
+  requestPermissionMiUI: function requestPermissionMiUI(successCallback, errorCallback) {
+    exec(successCallback, errorCallback, 'PushNotification', 'requestPermissionMiUI', []);
+  },
+
   createChannel: function createChannel(successCallback, errorCallback, channel) {
     exec(successCallback, errorCallback, 'PushNotification', 'createChannel', [channel]);
   },

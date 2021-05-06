@@ -123,6 +123,9 @@ public interface PushConstants {
   public static final String API_URL = "apiUrl";
   public static final String HAS_PERMISSION_SYSTEM_ALERT = "hasPermissionSystemAlert";
   public static final String REQUEST_PERMISSION_SYSTEM_ALERT = "requestPermissionSystemAlert";
+  public static final String HAS_PERMISSION_MIUI = "hasPermissionMiUI";
+  public static final String REQUEST_PERMISSION_MIUI = "requestPermissionMiUI";
   public static final int ANDROID_VERSION_MARSHMALLOW = 23;
   public static final int REQUEST_SYSTEM_ALERT_WINDOW = 1;
+  public static final int REQUEST_MIUI_PERMISSIONS = 2;
 }

@@ -489,6 +489,50 @@ public class PushPlugin extends CordovaPlugin implements PushConstants {
           }
         }
       });
+    } else if (HAS_PERMISSION_MIUI.equals(action)) {
+      cordova.getThreadPool().execute(new Runnable() {
+        public void run() {
+          JSONObject jo = new JSONObject();
+          try {
+            boolean hasPerm = hasMiUIPermission();
+            Log.d(LOG_TAG,
+              "has system alert permission: " + hasPerm);
+            jo.put("isEnabled", hasPerm);
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jo);
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
+          } catch (UnknownError e) {
+            callbackContext.error(e.getMessage());
+          } catch (JSONException e) {
+            callbackContext.error(e.getMessage());
+          }
+        }
+      });
+    } else if (REQUEST_PERMISSION_MIUI.equals(action)) {
+      permissionsContext = callbackContext;
+      cordova.setActivityResultCallback(this);
+      cordova.getThreadPool().execute(new Runnable() {
+        public void run() {
+          if (Build.VERSION.SDK_INT >= ANDROID_VERSION_MARSHMALLOW) {
+            String packageName = getApplicationContext().getPackageName();
+
+            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+            intent.setClassName("com.miui.securitycenter", "com.miui.permcenter.permissions.PermissionsEditorActivity");
+            intent.putExtra("extra_pkgname", packageName);
+
+            cordova.getActivity().startActivityForResult(intent,  REQUEST_MIUI_PERMISSIONS);
+          } else {
+            JSONObject jo = new JSONObject();
+            try {
+              jo.put("isEnabled", true);
+            } catch (JSONException e) {
+              e.printStackTrace();
+            }
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jo);
+            callbackContext.sendPluginResult(pluginResult);
+          }
+        }
+      });
     } else {
       Log.e(LOG_TAG, "Invalid action : " + action);
       callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.INVALID_ACTION));
@@ -556,10 +600,11 @@ public class PushPlugin extends CordovaPlugin implements PushConstants {
 
   @Override
   public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+    if (this.permissionsContext == null) {
+      return;
+    }
+
     if (requestCode == REQUEST_SYSTEM_ALERT_WINDOW) {
-      if (this.permissionsContext == null) {
-        return;
-      }
       try {
         JSONObject jo = new JSONObject();
         boolean hasPerm = hasSystemAlertPermission();
@@ -573,6 +618,19 @@ public class PushPlugin extends CordovaPlugin implements PushConstants {
         this.permissionsContext.error(e.getMessage());
       }
       this.permissionsContext = null;
+    } else if (requestCode == REQUEST_MIUI_PERMISSIONS) {
+      try {
+        JSONObject jo = new JSONObject();
+        boolean hasPerm = hasMiUIPermission();
+        Log.d(LOG_TAG,
+          "-----------miui permission result: " + hasPerm);
+        jo.put("isEnabled", hasPerm);
+        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jo);
+        this.permissionsContext.sendPluginResult(pluginResult);
+      } catch (JSONException e) {
+        e.printStackTrace();
+        this.permissionsContext.error(e.getMessage());
+      }
     }
   }
 
@@ -609,6 +667,10 @@ public class PushPlugin extends CordovaPlugin implements PushConstants {
 
   private boolean hasSystemAlertPermission() {
     return Build.VERSION.SDK_INT < ANDROID_VERSION_MARSHMALLOW || Settings.canDrawOverlays(getApplicationContext());
+  }
+
+  private boolean hasMiUIPermission() {
+    return isMiUIWithApi23OrMore(); //ToDo: Implement permissions check
   }
 
   private void clearAllNotifications() {
@@ -733,5 +795,41 @@ public class PushPlugin extends CordovaPlugin implements PushConstants {
 
   protected static void setRegistrationID(String token) {
     registration_id = token;
+  }
+
+   /**
+   * MIUI detection
+   * reference:
+   * https://www.javaer101.com/en/article/37455781.html
+   * https://gist.github.com/Muyangmin/e8ec1002c930d8df3df46b306d03315d
+   */
+  public static final boolean isMiUi() {
+    return !TextUtils.isEmpty(getSystemProperty("ro.miui.ui.version.name"));
+  }
+
+  private boolean isMiUIWithApi23OrMore() {
+    return Build.VERSION.SDK_INT < ANDROID_VERSION_MARSHMALLOW || !isMiUi();
+  }
+
+  private static final String getSystemProperty(String propName) {
+    String line;
+    BufferedReader input = null;
+    try {
+      java.lang.Process p = Runtime.getRuntime().exec("getprop " + propName);
+      input = new BufferedReader(new InputStreamReader(p.getInputStream()), 1024);
+      line = input.readLine();
+      input.close();
+    } catch (IOException ex) {
+      return null;
+    } finally {
+      if (input != null) {
+        try {
+          input.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
+    }
+    return line;
   }
 }
