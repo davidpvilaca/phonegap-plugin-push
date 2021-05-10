@@ -16,6 +16,8 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
@@ -30,7 +32,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
