@@ -6,6 +6,7 @@ import android.os.Build;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -25,6 +26,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -113,6 +115,12 @@ public class BeeBeeApiService {
         return params;
       }
     };
+
+    jsObjRequest.setRetryPolicy(new DefaultRetryPolicy(
+      (int) TimeUnit.SECONDS.toMillis(30),
+      0,
+      DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+    ));
 
     mQueue.add(jsObjRequest);
   }
